@@ -1,25 +1,26 @@
 export interface Fare {
-  id: string;
-  amount: number;
-  timestamp: number;
+	id: string;
+	amount: number;
+	timestamp: number;
 }
 
 export interface CurrentShift {
-  startTs: number;
-  fares: Fare[];
-  trips: number;
+	startTs: number;
+	fares: Fare[];
+	trips: number;
 }
 
 export interface ShiftHistory {
-  id: string;
-  startTs: number;
-  endTs: number;
-  seconds: number;
-  earnings: number;
-  trips: number;
+	id: string;
+	startTs: number;
+	endTs: number;
+	seconds: number;
+	earnings: number;
+	trips: number;
+	platformSummary?: Record<string, { count: number; total: number }>;
 }
 
 export interface TrackerState {
-  currentShift: CurrentShift | null;
-  history: ShiftHistory[];
+	currentShift: CurrentShift | null;
+	history: ShiftHistory[];
 }

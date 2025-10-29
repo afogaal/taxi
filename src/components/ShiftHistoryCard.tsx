@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShiftHistory } from "@/types/tracker";
+import { PlatformBreakdownCard } from "./PlatformBreakdownCard";
 import { formatDate, formatTimeOnly, secondsToHM } from "@/utils/timeUtils";
 import { Download, Trash2, History } from "lucide-react";
 
