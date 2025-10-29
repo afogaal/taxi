@@ -2,6 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 
 interface AddFareCardProps {
 	fareInput: string;
@@ -24,11 +31,7 @@ export function AddFareCard({
 		if (e.key === "Enter" && !disabled) {
 			onAddFare();
 		}
-
-    
 	};
-
-
 
 	return (
 		<Card>
@@ -49,16 +52,20 @@ export function AddFareCard({
 							className="w-[60%]"
 							disabled={disabled}
 						/>
-						<select
+						<Select
 							value={platform}
-							onChange={(e) => onPlatformChange(e.target.value)}
-							className="border rounded-md px-2 py-1 w-[40%] bg-white text-gray-700"
+							onValueChange={onPlatformChange}
 							disabled={disabled}
 						>
-							<option value="Uber">Uber</option>
-							<option value="Bolt">Bolt</option>
-							<option value="Hailing">Hailing</option>
-						</select>
+							<SelectTrigger className="w-[40%]">
+								<SelectValue placeholder="Platform" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="Uber">Uber</SelectItem>
+								<SelectItem value="Bolt">Bolt</SelectItem>
+								<SelectItem value="Hailing">Hailing</SelectItem>
+							</SelectContent>
+						</Select>
 					</div>
 
 					<Button
