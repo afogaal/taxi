@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CurrentShiftCard } from "@/components/CurrentShiftCard";
 import { AddFareCard } from "@/components/AddFareCard";
 import { SummaryCard } from "@/components/SummaryCard";
+import { PlatformBreakdownCard } from "@/components/PlatformBreakdownCard";
 import { ShiftHistoryCard } from "@/components/ShiftHistoryCard";
 import { EditFareDialog } from "@/components/EditFareDialog";
 import { TrackerState, Fare, ShiftHistory } from "@/types/tracker";
@@ -124,6 +125,7 @@ function TaxiTrackerContent() {
 			id: `fare-${Date.now()}`,
 			amount: adjustedFare,
 			timestamp: Date.now(),
+			platform, // 👈 add this line
 		};
 
 		setState((s) => {
@@ -273,6 +275,9 @@ function TaxiTrackerContent() {
 					onEditFare={editFare}
 					onDeleteFare={deleteFare}
 				/>
+				{state.currentShift && (
+					<PlatformBreakdownCard fares={state.currentShift.fares} />
+				)}
 
 				{/* Shift History */}
 				<ShiftHistoryCard
