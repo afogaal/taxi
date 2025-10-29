@@ -26,7 +26,7 @@ export function PlatformBreakdownCard({ fares }: PlatformBreakdownCardProps) {
 				{entries.map(([name, data]) => (
 					<div
 						key={name}
-						className="flex justify-between text-sm text-muted-foreground"
+						className="flex  text-sm text-muted-foreground"
 					>
 						<span className="font-medium">{name}</span>
 						<span>
