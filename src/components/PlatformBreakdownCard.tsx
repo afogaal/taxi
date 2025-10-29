@@ -19,22 +19,28 @@ export function PlatformBreakdownCard({ fares }: PlatformBreakdownCardProps) {
 
 	return (
 		<Card>
-			<CardHeader>
-				<CardTitle>Platform Breakdown</CardTitle>
+			<CardHeader className="pb-2">
+				<CardTitle className="text-base font-semibold">
+					Platform Breakdown
+				</CardTitle>
 			</CardHeader>
-			<CardContent className="space-y-1">
-				{entries.map(([name, data]) => (
-					<div
-						key={name}
-						className="flex  text-sm text-muted-foreground"
-					>
-						<span className="font-medium">{name} </span>
-						<span>
-							{data.count} ride{data.count > 1 ? "s" : ""} •{" "}
-							{data.total.toFixed(2)} kr
-						</span>
-					</div>
-				))}
+			<CardContent className="pt-0">
+				<div className="divide-y divide-border">
+					{entries.map(([name, data]) => (
+						<div
+							key={name}
+							className="flex justify-between py-1 text-sm leading-tight"
+						>
+							<span className="font-medium text-foreground">
+								{name}
+							</span>
+							<span className="text-right text-muted-foreground tabular-nums">
+								{data.count} ride{data.count > 1 ? "s" : ""} •{" "}
+								{data.total.toFixed(2)} kr
+							</span>
+						</div>
+					))}
+				</div>
 			</CardContent>
 		</Card>
 	);
