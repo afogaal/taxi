@@ -82,6 +82,16 @@ function TaxiTrackerContent() {
 			0
 		);
 		const trips = state.currentShift.trips;
+
+		// 👇 new: group fares by platform
+		const platformSummary = state.currentShift.fares.reduce((acc, f) => {
+			const p = f.platform || "Unknown";
+			if (!acc[p]) acc[p] = { count: 0, total: 0 };
+			acc[p].count += 1;
+			acc[p].total += f.amount;
+			return acc;
+		}, {} as Record<string, { count: number; total: number }>);
+
 		const shiftRecord: ShiftHistory = {
 			id: `shift-${Date.now()}`,
 			startTs,
@@ -89,12 +99,15 @@ function TaxiTrackerContent() {
 			seconds,
 			earnings,
 			trips,
+			platformSummary, // 👈 new field added
 		};
+
 		setState((s) => ({
 			...s,
 			currentShift: null,
 			history: [shiftRecord, ...s.history],
 		}));
+
 		toast.success(`Shift ended! Earned ${earnings.toFixed(2)} kr`);
 	}, [state.currentShift]);
 
