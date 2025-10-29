@@ -28,7 +28,7 @@ export function PlatformBreakdownCard({ fares }: PlatformBreakdownCardProps) {
 						key={name}
 						className="flex  text-sm text-muted-foreground"
 					>
-						<span className="font-medium">{name} • </span>
+						<span className="font-medium">{name} • </span> .{" "}
 						<span>
 							{data.count} ride{data.count > 1 ? "s" : ""} •{" "}
 							{data.total.toFixed(2)} kr
