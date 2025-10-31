@@ -59,7 +59,21 @@ export function SummaryCard({
 							<Coins className="h-3 w-3" />
 							<span>Earnings</span>
 						</div>
-						<div className="text-lg font-semibold text-primary">
+					
+
+						<div
+							className={`text-lg font-semibold ${
+								totalEarnings < 1000
+									? "text-red-500"
+									: totalEarnings < 2000
+									? "text-yellow-500"
+									: totalEarnings < 3000
+									? "text-green-500"
+									: totalEarnings < 4000
+									? "text-blue-500"
+									: "text-purple-500"
+							}`}
+						>
 							{totalEarnings.toFixed(2)} kr
 						</div>
 					</div>
