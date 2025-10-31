@@ -83,7 +83,7 @@ function TaxiTrackerContent() {
 		);
 		const trips = state.currentShift.trips;
 
-		// 👇 new: group fares by platform
+		// group fares by platform
 		const platformSummary = state.currentShift.fares.reduce((acc, f) => {
 			const p = f.platform || "Unknown";
 			if (!acc[p]) acc[p] = { count: 0, total: 0 };
@@ -99,7 +99,7 @@ function TaxiTrackerContent() {
 			seconds,
 			earnings,
 			trips,
-			platformSummary, // 👈 new field added
+			platformSummary,
 		};
 
 		setState((s) => ({
@@ -138,7 +138,7 @@ function TaxiTrackerContent() {
 			id: `fare-${Date.now()}`,
 			amount: adjustedFare,
 			timestamp: Date.now(),
-			platform, // 👈 add this line
+			platform,
 		};
 
 		setState((s) => {
@@ -211,6 +211,16 @@ function TaxiTrackerContent() {
 		);
 	}, [state.currentShift, nowSec]);
 
+	// ⏳ new 13-hour countdown
+	const remainingSeconds = useCallback(() => {
+		if (!state.currentShift) return 13 * 3600; // 13 hours in seconds
+		const elapsed = Math.max(
+			0,
+			Math.round((nowSec * 1000 - state.currentShift.startTs) / 1000)
+		);
+		return Math.max(0, 13 * 3600 - elapsed);
+	}, [state.currentShift, nowSec]);
+
 	const handleExportCSV = useCallback(() => {
 		exportToCSV(state.history);
 		toast.success("CSV exported successfully!");
@@ -264,7 +274,7 @@ function TaxiTrackerContent() {
 				<CurrentShiftCard
 					currentShift={state.currentShift}
 					elapsedSeconds={elapsedSeconds()}
-					remainingSeconds={remainingSeconds()}
+					remainingSeconds={remainingSeconds()} // 👈 now passed in
 					onStartShift={startShift}
 					onStartShiftCustom={startShiftCustom}
 					onEndShift={endShift}
@@ -289,6 +299,7 @@ function TaxiTrackerContent() {
 					onEditFare={editFare}
 					onDeleteFare={deleteFare}
 				/>
+
 				{state.currentShift && (
 					<PlatformBreakdownCard fares={state.currentShift.fares} />
 				)}
@@ -320,12 +331,10 @@ function TaxiTrackerContent() {
 	);
 }
 
-const Index = () => {
-	return (
-		<ThemeProvider defaultTheme="light">
-			<TaxiTrackerContent />
-		</ThemeProvider>
-	);
-};
+const Index = () => (
+	<ThemeProvider defaultTheme="light">
+		<TaxiTrackerContent />
+	</ThemeProvider>
+);
 
 export default Index;

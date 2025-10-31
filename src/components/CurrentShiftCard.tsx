@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { CurrentShift } from "@/types/tracker";
 import { formatTime, secondsToHMS } from "@/utils/timeUtils";
 import { Clock } from "lucide-react";
@@ -8,7 +7,7 @@ import { Clock } from "lucide-react";
 interface CurrentShiftCardProps {
 	currentShift: CurrentShift | null;
 	elapsedSeconds: number;
-
+	remainingSeconds?: number;
 	onStartShift: () => void;
 	onStartShiftCustom: () => void;
 	onEndShift: () => void;
@@ -18,11 +17,20 @@ interface CurrentShiftCardProps {
 export function CurrentShiftCard({
 	currentShift,
 	elapsedSeconds,
+	remainingSeconds = 0,
 	onStartShift,
 	onStartShiftCustom,
 	onEndShift,
 	onCancelShift,
 }: CurrentShiftCardProps) {
+	// color indicator for remaining time
+	const remainingClass =
+		remainingSeconds < 3600
+			? "text-red-500 font-semibold"
+			: remainingSeconds < 2 * 3600
+			? "text-yellow-500 font-semibold"
+			: "text-muted-foreground";
+
 	return (
 		<Card>
 			<CardHeader>
@@ -36,9 +44,11 @@ export function CurrentShiftCard({
 					</div>
 				</div>
 			</CardHeader>
+
 			<CardContent>
 				{currentShift ? (
 					<div className="space-y-4">
+						{/* Shift info */}
 						<div className="grid grid-cols-2 gap-3">
 							<div className="p-3 bg-muted rounded-lg">
 								<div className="text-xs text-muted-foreground mb-1">
@@ -48,6 +58,7 @@ export function CurrentShiftCard({
 									{formatTime(currentShift.startTs)}
 								</div>
 							</div>
+
 							<div className="p-3 bg-muted rounded-lg">
 								<div className="text-xs text-muted-foreground mb-1">
 									Working
@@ -55,9 +66,15 @@ export function CurrentShiftCard({
 								<div className="text-xl font-bold text-primary">
 									{secondsToHMS(elapsedSeconds)}
 								</div>
+								<div
+									className={`text-xs mt-1 ${remainingClass}`}
+								>
+									Remaining: {secondsToHMS(remainingSeconds)}
+								</div>
 							</div>
 						</div>
 
+						{/* Buttons */}
 						<div className="flex gap-2">
 							<Button
 								onClick={onEndShift}
