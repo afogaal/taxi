@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { ThemeProvider, useTheme } from "@/components/ThemeProvider";
 import { Button } from "@/components/ui/button";
 import { CurrentShiftCard } from "@/components/CurrentShiftCard";
@@ -237,7 +237,10 @@ function TaxiTrackerContent() {
 	}, []);
 
 	// 💡 Compute target remaining
-	const remainingTarget = Math.max(0, target - totalEarnings());
+
+	const remainingTarget = useMemo(() => {
+		return Math.max(0, target - totalEarnings());
+	}, [target, state.currentShift]);
 
 	return (
 		<div className="min-h-screen bg-background transition-colors duration-300">
