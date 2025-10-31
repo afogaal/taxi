@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { CurrentShift, Fare } from "@/types/tracker";
-import { Coins, Clock, Car, Edit2, Trash2, Target } from "lucide-react";
+import { Coins, Clock, Car, Edit2, Trash2, Target, Check } from "lucide-react";
 
 interface SummaryCardProps {
 	currentShift: CurrentShift | null;
@@ -11,6 +13,7 @@ interface SummaryCardProps {
 	target?: number;
 	onEditFare: (fare: Fare) => void;
 	onDeleteFare: (fareId: string) => void;
+	onTargetChange?: (newTarget: number) => void;
 }
 
 export function SummaryCard({
@@ -21,7 +24,18 @@ export function SummaryCard({
 	target,
 	onEditFare,
 	onDeleteFare,
+	onTargetChange,
 }: SummaryCardProps) {
+	const [isEditingTarget, setIsEditingTarget] = useState(false);
+	const [tempTarget, setTempTarget] = useState(target?.toString() || "");
+
+	const handleSaveTarget = () => {
+		const newValue = Number(tempTarget);
+		if (isNaN(newValue) || newValue <= 0) return;
+		onTargetChange?.(newValue);
+		setIsEditingTarget(false);
+	};
+
 	return (
 		<Card>
 			<CardHeader>
@@ -64,11 +78,42 @@ export function SummaryCard({
 				</div>
 
 				{/* 🎯 Target info */}
-				{typeof remainingTarget === "number" && target && (
+				{typeof remainingTarget === "number" && (
 					<div className="flex items-center justify-between text-sm text-muted-foreground border-t pt-2">
-						<div className="flex items-center gap-1">
+						<div className="flex items-center gap-2">
 							<Target className="h-3.5 w-3.5" />
-							<span>Target: {target.toFixed(0)} kr</span>
+							{isEditingTarget ? (
+								<>
+									<Input
+										type="number"
+										value={tempTarget}
+										onChange={(e) =>
+											setTempTarget(e.target.value)
+										}
+										className="h-6 w-20 text-xs"
+									/>
+									<Button
+										size="sm"
+										variant="ghost"
+										onClick={handleSaveTarget}
+										className="h-6 p-0 text-green-600"
+									>
+										<Check className="h-3 w-3" />
+									</Button>
+								</>
+							) : (
+								<>
+									<span>Target: {target?.toFixed(0)} kr</span>
+									<Button
+										size="sm"
+										variant="ghost"
+										onClick={() => setIsEditingTarget(true)}
+										className="h-6 p-0 text-muted-foreground"
+									>
+										<Edit2 className="h-3 w-3" />
+									</Button>
+								</>
+							)}
 						</div>
 						<span
 							className={
