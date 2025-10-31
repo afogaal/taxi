@@ -17,8 +17,6 @@ interface CurrentShiftCardProps {
 
 export function CurrentShiftCard({
 	currentShift,
-	remainingSeconds,
-	secondsToHM,
 	elapsedSeconds,
 	onStartShift,
 	onStartShiftCustom,
