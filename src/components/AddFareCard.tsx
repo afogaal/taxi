@@ -62,7 +62,7 @@ export function AddFareCard({
 							</SelectTrigger>
 							<SelectContent>
 								<SelectItem value="Uber">Uber</SelectItem>
-								<SelectItem value="Bolt">Bolt</SelectItem>
+
 								<SelectItem value="Hailing">Hailing</SelectItem>
 							</SelectContent>
 						</Select>
