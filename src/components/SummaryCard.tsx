@@ -1,13 +1,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CurrentShift, Fare } from "@/types/tracker";
-import { Coins, Clock, Car, Edit2, Trash2 } from "lucide-react";
+import { Coins, Clock, Car, Edit2, Trash2, Target } from "lucide-react";
 
 interface SummaryCardProps {
 	currentShift: CurrentShift | null;
 	totalEarnings: number;
 	elapsedSeconds: number;
-
 	remainingTarget?: number;
 	target?: number;
 	onEditFare: (fare: Fare) => void;
@@ -18,6 +17,8 @@ export function SummaryCard({
 	currentShift,
 	totalEarnings,
 	elapsedSeconds,
+	remainingTarget,
+	target,
 	onEditFare,
 	onDeleteFare,
 }: SummaryCardProps) {
@@ -27,6 +28,7 @@ export function SummaryCard({
 				<CardTitle>Summary</CardTitle>
 			</CardHeader>
 			<CardContent className="space-y-4">
+				{/* Top stats */}
 				<div className="grid grid-cols-3 gap-3 text-center">
 					<div className="p-3 bg-muted rounded-lg">
 						<div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
@@ -37,6 +39,7 @@ export function SummaryCard({
 							{currentShift ? currentShift.trips : 0}
 						</div>
 					</div>
+
 					<div className="p-3 bg-muted rounded-lg">
 						<div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
 							<Coins className="h-3 w-3" />
@@ -46,7 +49,6 @@ export function SummaryCard({
 							{totalEarnings.toFixed(2)} kr
 						</div>
 					</div>
-				
 
 					<div className="p-3 bg-muted rounded-lg">
 						<div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
@@ -60,21 +62,27 @@ export function SummaryCard({
 						</div>
 					</div>
 				</div>
-        	{typeof remainingTarget === "number" && (
-						<div className="text-sm text-muted-foreground">
-							Remaining target:{" "}
-							<span
-								className={
-									remainingTarget === 0
-										? "text-green-600 font-semibold"
-										: "text-primary font-semibold"
-								}
-							>
-								{remainingTarget.toFixed(2)} kr
-							</span>
-						</div>
-					)}
 
+				{/* 🎯 Target info */}
+				{typeof remainingTarget === "number" && target && (
+					<div className="flex items-center justify-between text-sm text-muted-foreground border-t pt-2">
+						<div className="flex items-center gap-1">
+							<Target className="h-3.5 w-3.5" />
+							<span>Target: {target.toFixed(0)} kr</span>
+						</div>
+						<span
+							className={
+								remainingTarget <= 0
+									? "text-green-600 font-semibold"
+									: "text-primary font-semibold"
+							}
+						>
+							Remain: {remainingTarget.toFixed(2)} kr
+						</span>
+					</div>
+				)}
+
+				{/* Fares list */}
 				{currentShift && (
 					<div>
 						<div className="text-sm text-muted-foreground mb-2">

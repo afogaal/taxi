@@ -23,10 +23,7 @@ function TaxiTrackerContent() {
 		} catch (e) {
 			console.error("Failed to load state from localStorage", e);
 		}
-		return {
-			currentShift: null,
-			history: [],
-		};
+		return { currentShift: null, history: [] };
 	});
 
 	const [fareInput, setFareInput] = useState("");
@@ -34,13 +31,14 @@ function TaxiTrackerContent() {
 	const [nowSec, setNowSec] = useState(Math.floor(Date.now() / 1000));
 	const [editingFare, setEditingFare] = useState<Fare | null>(null);
 	const [editDialogOpen, setEditDialogOpen] = useState(false);
+	const [target, setTarget] = useState(3000); // 💰 Target goal
 
-	// Save state to localStorage
+	// Save to localStorage
 	useEffect(() => {
 		localStorage.setItem(LS_KEY, JSON.stringify(state));
 	}, [state]);
 
-	// Timer for elapsed time
+	// Timer
 	useEffect(() => {
 		const timer = setInterval(() => {
 			setNowSec(Math.floor(Date.now() / 1000));
@@ -83,7 +81,6 @@ function TaxiTrackerContent() {
 		);
 		const trips = state.currentShift.trips;
 
-		// group fares by platform
 		const platformSummary = state.currentShift.fares.reduce((acc, f) => {
 			const p = f.platform || "Unknown";
 			if (!acc[p]) acc[p] = { count: 0, total: 0 };
@@ -130,7 +127,6 @@ function TaxiTrackerContent() {
 			return;
 		}
 
-		// Apply Bolt -23% rule
 		const adjustedFare =
 			platform === "Bolt" ? parseFloat((fare * 0.77).toFixed(2)) : fare;
 
@@ -211,9 +207,8 @@ function TaxiTrackerContent() {
 		);
 	}, [state.currentShift, nowSec]);
 
-	// ⏳ new 13-hour countdown
 	const remainingSeconds = useCallback(() => {
-		if (!state.currentShift) return 13 * 3600; // 13 hours in seconds
+		if (!state.currentShift) return 13 * 3600;
 		const elapsed = Math.max(
 			0,
 			Math.round((nowSec * 1000 - state.currentShift.startTs) / 1000)
@@ -241,12 +236,12 @@ function TaxiTrackerContent() {
 		toast.success("Shift deleted");
 	}, []);
 
-	const [target, setTarget] = useState(3000);
+	// 💡 Compute target remaining
+	const remainingTarget = Math.max(0, target - totalEarnings());
 
 	return (
 		<div className="min-h-screen bg-background transition-colors duration-300">
 			<div className="max-w-3xl mx-auto p-4 space-y-4">
-				{/* Header */}
 				<header className="flex items-center justify-between py-4">
 					<div className="flex items-center gap-3">
 						<div className="p-2 bg-primary rounded-lg">
@@ -271,17 +266,17 @@ function TaxiTrackerContent() {
 						)}
 					</Button>
 				</header>
-				{/* Current Shift */}
+
 				<CurrentShiftCard
 					currentShift={state.currentShift}
 					elapsedSeconds={elapsedSeconds()}
-					remainingSeconds={remainingSeconds()} // 👈 now passed in
+					remainingSeconds={remainingSeconds()}
 					onStartShift={startShift}
 					onStartShiftCustom={startShiftCustom}
 					onEndShift={endShift}
 					onCancelShift={cancelShift}
 				/>
-				{/* Add Fare */}
+
 				<AddFareCard
 					fareInput={fareInput}
 					platform={platform}
@@ -290,21 +285,22 @@ function TaxiTrackerContent() {
 					onAddFare={addFare}
 					disabled={!state.currentShift}
 				/>
-				const remainingTarget = Math.max(0, target - totalEarnings());
+
 				{/* Summary */}
 				<SummaryCard
 					currentShift={state.currentShift}
 					totalEarnings={totalEarnings()}
-					remainingTarget={remainingTarget} // 👈 new prop
+					remainingTarget={remainingTarget}
 					target={target}
 					elapsedSeconds={elapsedSeconds()}
 					onEditFare={editFare}
 					onDeleteFare={deleteFare}
 				/>
+
 				{state.currentShift && (
 					<PlatformBreakdownCard fares={state.currentShift.fares} />
 				)}
-				{/* Shift History */}
+
 				<ShiftHistoryCard
 					history={[...state.history].sort(
 						(a, b) => b.startTs - a.startTs
@@ -313,13 +309,12 @@ function TaxiTrackerContent() {
 					onClearHistory={clearHistory}
 					onDeleteShift={deleteShift}
 				/>
-				{/* Footer */}
+
 				<footer className="text-center text-xs text-muted-foreground py-6">
 					Data saved locally on this device. No accounts required.
 				</footer>
 			</div>
 
-			{/* Edit Fare Dialog */}
 			<EditFareDialog
 				fare={editingFare}
 				open={editDialogOpen}
