@@ -8,7 +8,7 @@ import { Clock } from "lucide-react";
 interface CurrentShiftCardProps {
 	currentShift: CurrentShift | null;
 	elapsedSeconds: number;
-	remainingSeconds?: number;
+
 	onStartShift: () => void;
 	onStartShiftCustom: () => void;
 	onEndShift: () => void;

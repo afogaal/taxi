@@ -211,8 +211,6 @@ function TaxiTrackerContent() {
 		);
 	}, [state.currentShift, nowSec]);
 
-	// timer for remaining working hours
-
 	const handleExportCSV = useCallback(() => {
 		exportToCSV(state.history);
 		toast.success("CSV exported successfully!");
