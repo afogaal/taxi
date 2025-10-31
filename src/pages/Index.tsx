@@ -212,14 +212,6 @@ function TaxiTrackerContent() {
 	}, [state.currentShift, nowSec]);
 
 	// timer for remaining working hours
-	const remainingSeconds = useCallback(() => {
-		if (!state.currentShift) return 13 * 3600; // 13 hours in seconds
-		const elapsed = Math.max(
-			0,
-			Math.round((nowSec * 1000 - state.currentShift.startTs) / 1000)
-		);
-		return Math.max(0, 13 * 3600 - elapsed);
-	}, [state.currentShift, nowSec]);
 
 	const handleExportCSV = useCallback(() => {
 		exportToCSV(state.history);

@@ -58,26 +58,6 @@ export function CurrentShiftCard({
 							</div>
 						</div>
 
-						{/* Remaining time */}
-						{currentShift && (
-							<div className="text-sm text-muted-foreground">
-								Remaining time:{" "}
-								<span
-									className={
-										remainingSeconds &&
-										remainingSeconds < 3600
-											? "text-red-500 font-semibold"
-											: remainingSeconds &&
-											  remainingSeconds < 2 * 3600
-											? "text-yellow-500 font-semibold"
-											: "text-muted-foreground"
-									}
-								>
-									{secondsToHM(remainingSeconds || 0)}
-								</span>
-							</div>
-						)}
-
 						<div className="flex gap-2">
 							<Button
 								onClick={onEndShift}
