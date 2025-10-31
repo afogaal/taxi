@@ -13,6 +13,11 @@ interface CurrentShiftCardProps {
 	onEndShift: () => void;
 	onCancelShift: () => void;
 }
+const secondsToHM = (seconds: number) => {
+	const h = Math.floor(seconds / 3600);
+	const m = Math.floor((seconds % 3600) / 60);
+	return `${String(h).padStart(2, "0")}h ${String(m).padStart(2, "0")}m`;
+};
 
 export function CurrentShiftCard({
 	currentShift,
@@ -69,7 +74,8 @@ export function CurrentShiftCard({
 								<div
 									className={`text-xs mt-1 ${remainingClass}`}
 								>
-									Remaining: {secondsToHMS(remainingSeconds)}
+									Remaining:
+									{secondsToHM(remainingSeconds)}
 								</div>
 							</div>
 						</div>
