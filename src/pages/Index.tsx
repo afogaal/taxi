@@ -241,6 +241,8 @@ function TaxiTrackerContent() {
 		toast.success("Shift deleted");
 	}, []);
 
+	const [target, setTarget] = useState(3000);
+
 	return (
 		<div className="min-h-screen bg-background transition-colors duration-300">
 			<div className="max-w-3xl mx-auto p-4 space-y-4">
@@ -269,7 +271,6 @@ function TaxiTrackerContent() {
 						)}
 					</Button>
 				</header>
-
 				{/* Current Shift */}
 				<CurrentShiftCard
 					currentShift={state.currentShift}
@@ -280,7 +281,6 @@ function TaxiTrackerContent() {
 					onEndShift={endShift}
 					onCancelShift={cancelShift}
 				/>
-
 				{/* Add Fare */}
 				<AddFareCard
 					fareInput={fareInput}
@@ -290,20 +290,20 @@ function TaxiTrackerContent() {
 					onAddFare={addFare}
 					disabled={!state.currentShift}
 				/>
-
+				const remainingTarget = Math.max(0, target - totalEarnings());
 				{/* Summary */}
 				<SummaryCard
 					currentShift={state.currentShift}
 					totalEarnings={totalEarnings()}
+					remainingTarget={remainingTarget} // 👈 new prop
+					target={target}
 					elapsedSeconds={elapsedSeconds()}
 					onEditFare={editFare}
 					onDeleteFare={deleteFare}
 				/>
-
 				{state.currentShift && (
 					<PlatformBreakdownCard fares={state.currentShift.fares} />
 				)}
-
 				{/* Shift History */}
 				<ShiftHistoryCard
 					history={[...state.history].sort(
@@ -313,7 +313,6 @@ function TaxiTrackerContent() {
 					onClearHistory={clearHistory}
 					onDeleteShift={deleteShift}
 				/>
-
 				{/* Footer */}
 				<footer className="text-center text-xs text-muted-foreground py-6">
 					Data saved locally on this device. No accounts required.
