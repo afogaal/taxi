@@ -298,6 +298,7 @@ function TaxiTrackerContent() {
 					elapsedSeconds={elapsedSeconds()}
 					onEditFare={editFare}
 					onDeleteFare={deleteFare}
+					onTargetChange={(newTarget) => setTarget(newTarget)}
 				/>
 
 				{state.currentShift && (
