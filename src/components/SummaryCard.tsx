@@ -61,7 +61,7 @@ export function SummaryCard({
 			</CardHeader>
 			<CardContent className="space-y-4">
 				{/* ***** TOP GRID: TRIPS / EARNINGS / HOURS / HOURLY ***** */}
-				<div className="grid grid-cols-4 gap-3 text-center">
+				<div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
 					{/* Trips */}
 					<div className="p-3 bg-muted rounded-lg">
 						<div className="text-xs text-muted-foreground mb-1">
