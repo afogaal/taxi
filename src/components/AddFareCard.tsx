@@ -53,6 +53,30 @@ export function AddFareCard({
 				<CardTitle>Add Fare</CardTitle>
 			</CardHeader>
 			<CardContent>
+				{/* Busy / Vacancy toggle + busy time */}
+					<div className="flex items-center gap-2">
+						<Button
+							type="button"
+							onClick={onToggleBusy}
+							disabled={disabled || !onToggleBusy}
+							className={`flex-1 ${
+								busyActive
+									? "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+									: "bg-green-600 hover:bg-green-600/90 text-white"
+							}`}
+						>
+							{busyActive ? "Busy" : "Vacancy"}
+						</Button>
+						<div className="px-3 py-2 bg-muted rounded-lg text-sm">
+							<div className="text-xs text-muted-foreground">
+								Busy time
+							</div>
+							<div className="font-semibold">
+								{secondsToHM(busySeconds)}
+							</div>
+						</div>
+					</div>
+
 				<div className="flex flex-col gap-3">
 					{/* Amount + platform */}
 					<div className="flex gap-2">
@@ -84,29 +108,7 @@ export function AddFareCard({
 						</Select>
 					</div>
 
-					{/* Busy / Vacancy toggle + busy time */}
-					<div className="flex items-center gap-2">
-						<Button
-							type="button"
-							onClick={onToggleBusy}
-							disabled={disabled || !onToggleBusy}
-							className={`flex-1 ${
-								busyActive
-									? "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-									: "bg-green-600 hover:bg-green-600/90 text-white"
-							}`}
-						>
-							{busyActive ? "Busy" : "Vacancy"}
-						</Button>
-						<div className="px-3 py-2 bg-muted rounded-lg text-sm">
-							<div className="text-xs text-muted-foreground">
-								Busy time
-							</div>
-							<div className="font-semibold">
-								{secondsToHM(busySeconds)}
-							</div>
-						</div>
-					</div>
+					
 
 					{/* Add fare */}
 					<Button
