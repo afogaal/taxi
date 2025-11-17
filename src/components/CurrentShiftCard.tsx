@@ -16,6 +16,12 @@ interface CurrentShiftCardProps {
 const secondsToHM = (seconds: number) => {
 	const h = Math.floor(seconds / 3600);
 	const m = Math.floor((seconds % 3600) / 60);
+	return `${String(h).padStart(2, "0")}h ${String(m).padStart(2, "0")}m`;
+};
+
+const workingTimer = (seconds: number) => {
+	const h = Math.floor(seconds / 3600);
+	const m = Math.floor((seconds % 3600) / 60);
 	const s = seconds % 60;
 	return `${String(h).padStart(2, "0")}h ${String(m).padStart(
 		2,
@@ -73,7 +79,7 @@ export function CurrentShiftCard({
 									Working
 								</div>
 								<div className="text-xl font-bold text-primary">
-									{secondsToHM(elapsedSeconds)}
+									{workingTimer(elapsedSeconds)}
 								</div>
 								<div
 									className={`text-xs mt-1 ${remainingClass}`}
