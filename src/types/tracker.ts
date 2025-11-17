@@ -8,6 +8,9 @@ export interface CurrentShift {
 	startTs: number;
 	fares: Fare[];
 	trips: number;
+
+	busyStartTs?: number | null; // when Busy was turned on (ms)
+	busySeconds?: number; // accumulated busy seconds in this shift
 }
 
 export interface ShiftHistory {
@@ -18,6 +21,8 @@ export interface ShiftHistory {
 	earnings: number;
 	trips: number;
 	platformSummary?: Record<string, { count: number; total: number }>;
+
+	busySeconds?: number; // total busy seconds saved for this shift
 }
 
 export interface TrackerState {

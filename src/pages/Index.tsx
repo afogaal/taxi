@@ -50,7 +50,13 @@ function TaxiTrackerContent() {
 		if (state.currentShift) return;
 		setState((s) => ({
 			...s,
-			currentShift: { startTs: Date.now(), fares: [], trips: 0 },
+			currentShift: {
+				startTs: Date.now(),
+				fares: [],
+				trips: 0,
+				busyStartTs: null,
+				busySeconds: 0,
+			},
 		}));
 		toast.success("Shift started!");
 	}, [state.currentShift]);
@@ -65,9 +71,56 @@ function TaxiTrackerContent() {
 		}
 		setState((s) => ({
 			...s,
-			currentShift: { startTs: parsed.getTime(), fares: [], trips: 0 },
+			currentShift: {
+				startTs: parsed.getTime(),
+				fares: [],
+				trips: 0,
+				busyStartTs: null,
+				busySeconds: 0,
+			},
 		}));
 		toast.success("Shift started with custom time!");
+	}, []);
+
+	const currentBusySeconds = useCallback(() => {
+		if (!state.currentShift) return 0;
+		const base = state.currentShift.busySeconds ?? 0;
+		const running = state.currentShift.busyStartTs
+			? Math.max(
+					0,
+					Math.round(
+						(nowSec * 1000 - state.currentShift.busyStartTs) / 1000
+					)
+			  )
+			: 0;
+		return base + running;
+	}, [state.currentShift, nowSec]);
+
+	const toggleBusy = useCallback(() => {
+		setState((s) => {
+			if (!s.currentShift) return s;
+			const cs = s.currentShift;
+			// If currently vacant -> turn Busy ON (record start)
+			if (!cs.busyStartTs) {
+				return {
+					...s,
+					currentShift: { ...cs, busyStartTs: Date.now() },
+				};
+			}
+			// If currently busy -> turn Busy OFF (add elapsed to busySeconds)
+			const justElapsed = Math.max(
+				0,
+				Math.round((Date.now() - cs.busyStartTs) / 1000)
+			);
+			return {
+				...s,
+				currentShift: {
+					...cs,
+					busyStartTs: null,
+					busySeconds: (cs.busySeconds ?? 0) + justElapsed,
+				},
+			};
+		});
 	}, []);
 
 	const endShift = useCallback(() => {
@@ -80,6 +133,13 @@ function TaxiTrackerContent() {
 			0
 		);
 		const trips = state.currentShift.trips;
+		let finalBusySeconds = state.currentShift.busySeconds ?? 0;
+		if (state.currentShift.busyStartTs) {
+			finalBusySeconds += Math.max(
+				0,
+				Math.round((Date.now() - state.currentShift.busyStartTs) / 1000)
+			);
+		}
 
 		const platformSummary = state.currentShift.fares.reduce((acc, f) => {
 			const p = f.platform || "Unknown";
@@ -97,6 +157,7 @@ function TaxiTrackerContent() {
 			earnings,
 			trips,
 			platformSummary,
+			busySeconds: finalBusySeconds,
 		};
 
 		setState((s) => ({
@@ -274,6 +335,9 @@ function TaxiTrackerContent() {
 					currentShift={state.currentShift}
 					elapsedSeconds={elapsedSeconds()}
 					remainingSeconds={remainingSeconds()}
+					busySeconds={currentBusySeconds()} // NEW
+					busyActive={Boolean(state.currentShift?.busyStartTs)} // NEW
+					onToggleBusy={toggleBusy} // NEW
 					onStartShift={startShift}
 					onStartShiftCustom={startShiftCustom}
 					onEndShift={endShift}

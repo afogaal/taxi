@@ -82,6 +82,30 @@ export function ShiftHistoryCard({
 											</span>
 										</div>
 
+										{typeof h.busySeconds === "number" && (
+											<div className="text-xs text-muted-foreground mt-1">
+												Busy:{" "}
+												{(() => {
+													const s = h.busySeconds!;
+													const hhh = Math.floor(
+														s / 3600
+													);
+													const mm = Math.floor(
+														(s % 3600) / 60
+													);
+													return `${String(
+														hhh
+													).padStart(
+														2,
+														"0"
+													)}h ${String(mm).padStart(
+														2,
+														"0"
+													)}m`;
+												})()}
+											</div>
+										)}
+
 										{/* Platform breakdown */}
 										{h.platformSummary && (
 											<div className="mt-1 space-y-0.5">
