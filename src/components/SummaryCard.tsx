@@ -28,6 +28,8 @@ export function SummaryCard({
 }: SummaryCardProps) {
 	const [isEditingTarget, setIsEditingTarget] = useState(false);
 	const [tempTarget, setTempTarget] = useState(target?.toString() || "");
+	const hourly =
+		elapsedSeconds > 0 ? totalEarnings / (elapsedSeconds / 3600) : 0;
 
 	const handleSaveTarget = () => {
 		const newValue = Number(tempTarget);
@@ -43,7 +45,7 @@ export function SummaryCard({
 			</CardHeader>
 			<CardContent className="space-y-4">
 				{/* Top stats */}
-				<div className="grid grid-cols-3 gap-3 text-center">
+				<div className="grid grid-cols-4 gap-3 text-center">
 					<div className="p-3 bg-muted rounded-lg">
 						<div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
 							<Car className="h-3 w-3" />
@@ -59,7 +61,6 @@ export function SummaryCard({
 							<Coins className="h-3 w-3" />
 							<span>Earnings</span>
 						</div>
-					
 
 						<div
 							className={`text-lg font-semibold ${
@@ -87,6 +88,14 @@ export function SummaryCard({
 							{currentShift
 								? (elapsedSeconds / 3600).toFixed(2)
 								: "0.00"}
+						</div>
+					</div>
+					<div className="p-3 bg-muted rounded-lg">
+						<div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-1">
+							<span>Kr / Hour</span>
+						</div>
+						<div className="text-lg font-semibold">
+							{hourly.toFixed(0)} kr
 						</div>
 					</div>
 				</div>
