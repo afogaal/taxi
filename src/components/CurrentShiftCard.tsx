@@ -63,30 +63,38 @@ export function CurrentShiftCard({
 			<CardContent>
 				{currentShift ? (
 					<div className="space-y-4">
-						{/* Shift info */}
-						<div className="grid grid-cols-2 gap-3">
-							<div className="p-3 bg-muted rounded-lg">
-								<div className="text-xs text-muted-foreground mb-1">
-									Started
-								</div>
-								<div className="text-sm font-medium">
+						{/* Shift info – 3 rows vertically */}
+						<div className="p-3 bg-muted rounded-lg space-y-2">
+							{/* Started */}
+							<div className="flex justify-between text-xs">
+								<span className="text-muted-foreground">
+									Started:
+								</span>
+								<span className="font-medium text-sm">
 									{formatTime(currentShift.startTs)}
-								</div>
+								</span>
 							</div>
 
-							<div className="p-3 bg-muted rounded-lg">
-								<div className="text-xs text-muted-foreground mb-1">
-									Working
-								</div>
-								<div className="text-xl font-bold text-primary">
+							{/* Working */}
+							<div className="flex justify-between text-xs">
+								<span className="text-muted-foreground">
+									Working:
+								</span>
+								<span className="text-primary text-lg font-bold">
 									{workingTimer(elapsedSeconds)}
-								</div>
-								<div
-									className={`text-xs mt-1 ${remainingClass}`}
-								>
+								</span>
+							</div>
+
+							{/* Remaining */}
+							<div className="flex justify-between text-xs">
+								<span className="text-muted-foreground">
 									Remaining:
+								</span>
+								<span
+									className={`font-medium text-sm ${remainingClass}`}
+								>
 									{secondsToHM(remainingSeconds)}
-								</div>
+								</span>
 							</div>
 						</div>
 
