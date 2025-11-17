@@ -65,7 +65,7 @@ export function CurrentShiftCard({
 					<div className="space-y-4">
 						{/* Shift info */}
 						<div className="grid grid-cols-2 gap-3">
-							<div className="p-3 bg-muted rounded-lg">
+							<div className="p-2 bg-muted rounded-lg">
 								<div className="text-xs text-muted-foreground mb-1">
 									Started
 								</div>
