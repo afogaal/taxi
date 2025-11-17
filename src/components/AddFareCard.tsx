@@ -10,10 +10,14 @@ import {
 } from "@/components/ui/select";
 import { Plus } from "lucide-react";
 
-const secondsToHM = (seconds: number) => {
+const secondsToHMS = (seconds: number) => {
 	const h = Math.floor(seconds / 3600);
 	const m = Math.floor((seconds % 3600) / 60);
-	return `${String(h).padStart(2, "0")}h ${String(m).padStart(2, "0")}m`;
+	const s = seconds % 60;
+	return `${String(h).padStart(2, "0")}h ${String(m).padStart(
+		2,
+		"0"
+	)}m ${String(s).padStart(2, "0")}s`;
 };
 
 interface AddFareCardProps {
@@ -69,7 +73,7 @@ export function AddFareCard({
 							Busy time
 						</div>
 						<div className="font-semibold">
-							{secondsToHM(busySeconds)}
+							{secondsToHMS(busySeconds)}
 						</div>
 					</div>
 				</div>
