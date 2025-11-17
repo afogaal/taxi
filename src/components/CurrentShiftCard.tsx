@@ -87,6 +87,19 @@ export function CurrentShiftCard({
 							</div>
 						</div>
 
+						{/* End/Cancel */}
+						<div className="flex gap-2">
+							<Button
+								onClick={onEndShift}
+								variant="destructive"
+								className="flex-1"
+							>
+								End Shift
+							</Button>
+							<Button onClick={onCancelShift} variant="outline">
+								Cancel
+							</Button>
+						</div>
 						{/* Busy toggle + busy timer */}
 						<div className="flex items-center gap-2">
 							<Button
@@ -107,20 +120,6 @@ export function CurrentShiftCard({
 									{secondsToHM(busySeconds)}
 								</div>
 							</div>
-						</div>
-
-						{/* End/Cancel */}
-						<div className="flex gap-2">
-							<Button
-								onClick={onEndShift}
-								variant="destructive"
-								className="flex-1"
-							>
-								End Shift
-							</Button>
-							<Button onClick={onCancelShift} variant="outline">
-								Cancel
-							</Button>
 						</div>
 					</div>
 				) : (
