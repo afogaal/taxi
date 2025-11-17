@@ -60,7 +60,7 @@ export function AddFareCard({
 						type="button"
 						onClick={onToggleBusy}
 						disabled={disabled || !onToggleBusy}
-						className={`flex-1 h-12 text-base font-semibold ${
+						className={`flex-1 h-12 text-base font-semibold flex items-center justify-center ${
 							busyActive
 								? "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
 								: "bg-green-600 hover:bg-green-600/90 text-white"
@@ -69,8 +69,8 @@ export function AddFareCard({
 						{busyActive ? "Busy" : "Vacancy"}
 					</Button>
 
-					<div className="px-3 py-2 bg-muted rounded-lg text-center w-[90px]">
-						<div className="text-[10px] text-muted-foreground leading-none mb-1">
+					<div className="h-12 w-[95px] bg-muted rounded-lg flex flex-col items-center justify-center">
+						<div className="text-[10px] text-muted-foreground leading-none mb-[2px]">
 							Busy Time
 						</div>
 						<div className="font-semibold text-sm leading-none">
