@@ -69,7 +69,7 @@ export function CurrentShiftCard({
 									Working
 								</div>
 								<div className="text-xl font-bold text-primary">
-									{secondsToHMS(elapsedSeconds)}
+									{secondsToHM(elapsedSeconds)}
 								</div>
 								<div
 									className={`text-xs mt-1 ${remainingClass}`}
