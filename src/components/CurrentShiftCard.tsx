@@ -91,7 +91,7 @@ export function CurrentShiftCard({
 									Remaining:
 								</span>
 								<span
-									className={`font-medium text-xs ${remainingClass}`}
+									className={`font-semibold text-base ${remainingClass}`}
 								>
 									{secondsToHM(remainingSeconds)}
 								</span>
