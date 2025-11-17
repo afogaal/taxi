@@ -335,9 +335,6 @@ function TaxiTrackerContent() {
 					currentShift={state.currentShift}
 					elapsedSeconds={elapsedSeconds()}
 					remainingSeconds={remainingSeconds()}
-					busySeconds={currentBusySeconds()} // NEW
-					busyActive={Boolean(state.currentShift?.busyStartTs)} // NEW
-					onToggleBusy={toggleBusy} // NEW
 					onStartShift={startShift}
 					onStartShiftCustom={startShiftCustom}
 					onEndShift={endShift}
@@ -351,6 +348,9 @@ function TaxiTrackerContent() {
 					onPlatformChange={setPlatform}
 					onAddFare={addFare}
 					disabled={!state.currentShift}
+					busySeconds={currentBusySeconds()} // 👈 NEW
+					busyActive={Boolean(state.currentShift?.busyStartTs)} // 👈 NEW
+					onToggleBusy={toggleBusy} // 👈 NEW
 				/>
 
 				{/* Summary */}
