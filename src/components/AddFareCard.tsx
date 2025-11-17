@@ -50,7 +50,6 @@ export function AddFareCard({
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Add Fare</CardTitle>
 				{/* Busy / Vacancy toggle + busy time */}
 				<div className="flex items-center gap-2">
 					<Button
