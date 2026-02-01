@@ -121,7 +121,7 @@ export function AddFareCard({
 					disabled={disabled}
 					type="tel" // makes numeric keypad show
 					inputMode="numeric" // ensures only numbers
-					pattern="[0-9]*" // optional, helps iOS
+					
 				/>
 				<Button
 					type="button"
