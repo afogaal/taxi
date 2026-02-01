@@ -17,20 +17,16 @@ const secondsToHMS = (seconds: number) => {
 	const s = seconds % 60;
 	return `${String(h).padStart(2, "0")}h ${String(m).padStart(
 		2,
-		"0"
+		"0",
 	)}m ${String(s).padStart(2, "0")}s`;
 };
 
-function parseHHMM(input: string) {
-	const match = /^(\d{1,2}):(\d{2})$/.exec(input);
-	if (!match) return null;
-
-	const h = Number(match[1]);
-	const m = Number(match[2]);
-	if (m >= 60) return null;
-
-	return h * 3600 + m * 60;
+function parseMMSS(input: string) {
+  const [m, s] = input.split(":").map(Number);
+  if (isNaN(m) || isNaN(s)) return 0;
+  return m * 60 + s;
 }
+
 
 interface AddFareCardProps {
 	fareInput: string;
@@ -86,9 +82,9 @@ export function AddFareCard({
 						onClick={onToggleBusy}
 						disabled={disabled}
 						className={`flex-1 h-12 text-base font-semibold ${
-							busyActive
-								? "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-								: "bg-green-600 hover:bg-green-600/90 text-white"
+							busyActive ?
+								"bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+							:	"bg-green-600 hover:bg-green-600/90 text-white"
 						}`}
 					>
 						{busyActive ? "Busy" : "Vacancy"}
@@ -103,26 +99,26 @@ export function AddFareCard({
 						</div>
 					</div>
 				</div>
-
 				{/* Manual busy input */}
-				<div className="flex gap-2 mt-2">
-					<Input
-						value={manualBusy}
-						onChange={(e) => setManualBusy(e.target.value)}
-						placeholder="HH:MM"
-						className="h-10"
-						disabled={disabled}
-					/>
-					<Button
-						type="button"
-						variant="outline"
-						className="h-10"
-						disabled={disabled || !manualBusy}
-						onClick={handleAddManualBusy}
-					>
-						+ Add
-					</Button>
-				</div>
+				const [manualBusy, setManualBusy] = useState(""); // inside
+				AddFareCard
+				<Input
+					placeholder="MM:SS"
+					className="h-10 text-sm"
+					value={manualBusy}
+					onChange={(e) => setManualBusy(e.target.value)}
+				/>
+				<Button
+					type="button"
+					variant="outline"
+					onClick={() => {
+						const seconds = parseMMSS(manualBusy);
+						onSetBusySeconds(seconds);
+						setManualBusy("");
+					}}
+				>
+					+ Add
+				</Button>
 			</CardHeader>
 
 			<CardContent>
