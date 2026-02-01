@@ -398,6 +398,20 @@ function TaxiTrackerContent() {
 					busyActive={Boolean(state.currentShift?.busyStartTs)}
 					onToggleBusy={toggleBusy}
 					onApplyManualBusy={applyManualBusy} // 👈 NEW
+					onSetBusySeconds={(seconds: number) => {
+						setState((s) => {
+							if (!s.currentShift) return s;
+							return {
+								...s,
+								currentShift: {
+									...s.currentShift,
+									busySeconds:
+										(s.currentShift.busySeconds ?? 0) +
+										seconds,
+								},
+							};
+						});
+					}}
 				/>
 
 				{/* Summary */}
