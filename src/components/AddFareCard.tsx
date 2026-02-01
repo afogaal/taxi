@@ -21,8 +21,6 @@ const secondsToHMS = (seconds: number) => {
 	)}m ${String(s).padStart(2, "0")}s`;
 };
 
-
-
 function parseMMSS(input: string) {
 	const [m, s] = input.split(":").map(Number);
 	if (isNaN(m) || isNaN(s)) return 0;
@@ -73,19 +71,18 @@ export function AddFareCard({
 		}
 	};
 	const handleManualBusyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, ""); // remove non-digits
-    if (value.length > 4) value = value.slice(0, 4); // max 4 digits MMSS
+		let value = e.target.value.replace(/\D/g, ""); // remove non-digits
+		if (value.length > 4) value = value.slice(0, 4); // max 4 digits MMSS
 
-    // auto-insert colon
-    if (value.length >= 3) {
-        value = value.slice(0, 2) + ":" + value.slice(2);
-    } else if (value.length >= 1) {
-        value = value;
-    }
+		// auto-insert colon
+		if (value.length >= 3) {
+			value = value.slice(0, 2) + ":" + value.slice(2);
+		} else if (value.length >= 1) {
+			value = value;
+		}
 
-    setManualBusy(value);
-};
-
+		setManualBusy(value);
+	};
 
 	return (
 		<Card>
@@ -120,7 +117,7 @@ export function AddFareCard({
 					placeholder="MM:SS"
 					className="h-10 text-sm"
 					value={manualBusy}
-					onChange={(e) => setManualBusy(e.target.value)}
+					onChange={handleManualBusyChange}
 					disabled={disabled}
 				/>
 				<Button
