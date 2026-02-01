@@ -116,10 +116,12 @@ export function AddFareCard({
 				<Input
 					placeholder="MM:SS"
 					className="h-10 text-sm"
-					type="number"
 					value={manualBusy}
 					onChange={handleManualBusyChange}
 					disabled={disabled}
+					type="tel" // makes numeric keypad show
+					inputMode="numeric" // ensures only numbers
+					pattern="[0-9]*" // optional, helps iOS
 				/>
 				<Button
 					type="button"
