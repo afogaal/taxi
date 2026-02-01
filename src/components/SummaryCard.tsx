@@ -153,7 +153,7 @@ export function SummaryCard({
 									: "text-primary font-semibold"
 							}
 						>
-							Remain: {remainingTarget.toFixed(2)} kr
+							Remain: {remainingTarget.toFixed(0)} kr
 						</span>
 					</div>
 				)}
@@ -177,7 +177,7 @@ export function SummaryCard({
 										className="inline-flex items-center gap-1.5 px-2 py-1 bg-muted rounded-md text-xs"
 									>
 										<span className="font-medium">
-											{fare.amount.toFixed(2)} kr
+											{fare.amount.toFixed(0)} kr
 										</span>
 
 										<span className="text-muted-foreground">
