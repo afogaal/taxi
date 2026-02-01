@@ -82,7 +82,7 @@ export function SummaryCard({
 						<div
 							className={`text-lg font-semibold ${earningColor}`}
 						>
-							{totalEarnings.toFixed(2)} kr
+							{totalEarnings.toFixed(0)} kr
 						</div>
 					</div>
 
