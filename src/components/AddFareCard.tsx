@@ -21,6 +21,8 @@ const secondsToHMS = (seconds: number) => {
 	)}m ${String(s).padStart(2, "0")}s`;
 };
 
+
+
 function parseMMSS(input: string) {
 	const [m, s] = input.split(":").map(Number);
 	if (isNaN(m) || isNaN(s)) return 0;
@@ -70,6 +72,20 @@ export function AddFareCard({
 			onAddFare();
 		}
 	};
+	const handleManualBusyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, ""); // remove non-digits
+    if (value.length > 4) value = value.slice(0, 4); // max 4 digits MMSS
+
+    // auto-insert colon
+    if (value.length >= 3) {
+        value = value.slice(0, 2) + ":" + value.slice(2);
+    } else if (value.length >= 1) {
+        value = value;
+    }
+
+    setManualBusy(value);
+};
+
 
 	return (
 		<Card>
