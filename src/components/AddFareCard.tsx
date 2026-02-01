@@ -22,11 +22,10 @@ const secondsToHMS = (seconds: number) => {
 };
 
 function parseMMSS(input: string) {
-  const [m, s] = input.split(":").map(Number);
-  if (isNaN(m) || isNaN(s)) return 0;
-  return m * 60 + s;
+	const [m, s] = input.split(":").map(Number);
+	if (isNaN(m) || isNaN(s)) return 0;
+	return m * 60 + s;
 }
-
 
 interface AddFareCardProps {
 	fareInput: string;
@@ -100,8 +99,7 @@ export function AddFareCard({
 					</div>
 				</div>
 				{/* Manual busy input */}
-				const [manualBusy, setManualBusy] = useState(""); // inside
-				AddFareCard
+
 				<Input
 					placeholder="MM:SS"
 					className="h-10 text-sm"
