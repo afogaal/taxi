@@ -60,7 +60,7 @@ export function AddFareCard({
 	const [manualBusy, setManualBusy] = useState("");
 
 	const handleAddManualBusy = () => {
-		const seconds = parseHHMM(manualBusy);
+		const seconds = parseMMSS(manualBusy);
 		if (seconds === null) return;
 		onSetBusySeconds(seconds);
 		setManualBusy("");
