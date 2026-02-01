@@ -105,6 +105,7 @@ export function AddFareCard({
 					className="h-10 text-sm"
 					value={manualBusy}
 					onChange={(e) => setManualBusy(e.target.value)}
+					disabled={disabled}
 				/>
 				<Button
 					type="button"
@@ -114,6 +115,7 @@ export function AddFareCard({
 						onSetBusySeconds(seconds);
 						setManualBusy("");
 					}}
+					disabled={disabled}
 				>
 					+ Add
 				</Button>
