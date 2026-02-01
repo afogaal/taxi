@@ -116,6 +116,7 @@ export function AddFareCard({
 				<Input
 					placeholder="MM:SS"
 					className="h-10 text-sm"
+					type="number"
 					value={manualBusy}
 					onChange={handleManualBusyChange}
 					disabled={disabled}
