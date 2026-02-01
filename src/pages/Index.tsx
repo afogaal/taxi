@@ -85,14 +85,15 @@ function TaxiTrackerContent() {
 	const currentBusySeconds = useCallback(() => {
 		if (!state.currentShift) return 0;
 		const base = state.currentShift.busySeconds ?? 0;
-		const running = state.currentShift.busyStartTs
-			? Math.max(
+		const running =
+			state.currentShift.busyStartTs ?
+				Math.max(
 					0,
 					Math.round(
-						(nowSec * 1000 - state.currentShift.busyStartTs) / 1000
-					)
-			  )
-			: 0;
+						(nowSec * 1000 - state.currentShift.busyStartTs) / 1000,
+					),
+				)
+			:	0;
 		return base + running;
 	}, [state.currentShift, nowSec]);
 
@@ -110,7 +111,7 @@ function TaxiTrackerContent() {
 			// If currently busy -> turn Busy OFF (add elapsed to busySeconds)
 			const justElapsed = Math.max(
 				0,
-				Math.round((Date.now() - cs.busyStartTs) / 1000)
+				Math.round((Date.now() - cs.busyStartTs) / 1000),
 			);
 			return {
 				...s,
@@ -123,6 +124,48 @@ function TaxiTrackerContent() {
 		});
 	}, []);
 
+	const applyManualBusy = useCallback((hhmm: string) => {
+		const match = /^(\d{1,2}):(\d{2})$/.exec(hhmm);
+		if (!match) {
+			toast.error("Use HH:MM format (e.g. 07:30)");
+			return;
+		}
+
+		const hours = Number(match[1]);
+		const minutes = Number(match[2]);
+		if (minutes >= 60) {
+			toast.error("Minutes must be < 60");
+			return;
+		}
+
+		const secondsToAdd = hours * 3600 + minutes * 60;
+
+		setState((s) => {
+			if (!s.currentShift) return s;
+			const cs = s.currentShift;
+
+			// If busy is running, stop it first
+			let baseSeconds = cs.busySeconds ?? 0;
+			if (cs.busyStartTs) {
+				baseSeconds += Math.max(
+					0,
+					Math.round((Date.now() - cs.busyStartTs) / 1000),
+				);
+			}
+
+			return {
+				...s,
+				currentShift: {
+					...cs,
+					busyStartTs: null,
+					busySeconds: baseSeconds + secondsToAdd,
+				},
+			};
+		});
+
+		toast.success("Busy time added");
+	}, []);
+
 	const endShift = useCallback(() => {
 		if (!state.currentShift) return;
 		const endTs = Date.now();
@@ -130,24 +173,29 @@ function TaxiTrackerContent() {
 		const seconds = Math.max(0, Math.round((endTs - startTs) / 1000));
 		const earnings = state.currentShift.fares.reduce(
 			(a, b) => a + b.amount,
-			0
+			0,
 		);
 		const trips = state.currentShift.trips;
 		let finalBusySeconds = state.currentShift.busySeconds ?? 0;
 		if (state.currentShift.busyStartTs) {
 			finalBusySeconds += Math.max(
 				0,
-				Math.round((Date.now() - state.currentShift.busyStartTs) / 1000)
+				Math.round(
+					(Date.now() - state.currentShift.busyStartTs) / 1000,
+				),
 			);
 		}
 
-		const platformSummary = state.currentShift.fares.reduce((acc, f) => {
-			const p = f.platform || "Unknown";
-			if (!acc[p]) acc[p] = { count: 0, total: 0 };
-			acc[p].count += 1;
-			acc[p].total += f.amount;
-			return acc;
-		}, {} as Record<string, { count: number; total: number }>);
+		const platformSummary = state.currentShift.fares.reduce(
+			(acc, f) => {
+				const p = f.platform || "Unknown";
+				if (!acc[p]) acc[p] = { count: 0, total: 0 };
+				acc[p].count += 1;
+				acc[p].total += f.amount;
+				return acc;
+			},
+			{} as Record<string, { count: number; total: number }>,
+		);
 
 		const shiftRecord: ShiftHistory = {
 			id: `shift-${Date.now()}`,
@@ -214,7 +262,7 @@ function TaxiTrackerContent() {
 		toast.success(
 			`${platform} fare added: ${adjustedFare.toFixed(2)} kr${
 				platform === "Bolt" ? " (after 23% fee)" : ""
-			}`
+			}`,
 		);
 	}, [state.currentShift, fareInput, platform]);
 
@@ -231,7 +279,7 @@ function TaxiTrackerContent() {
 				currentShift: {
 					...s.currentShift,
 					fares: s.currentShift.fares.map((f) =>
-						f.id === fareId ? { ...f, amount: newAmount } : f
+						f.id === fareId ? { ...f, amount: newAmount } : f,
 					),
 				},
 			};
@@ -264,7 +312,7 @@ function TaxiTrackerContent() {
 		if (!state.currentShift) return 0;
 		return Math.max(
 			0,
-			Math.round((nowSec * 1000 - state.currentShift.startTs) / 1000)
+			Math.round((nowSec * 1000 - state.currentShift.startTs) / 1000),
 		);
 	}, [state.currentShift, nowSec]);
 
@@ -272,7 +320,7 @@ function TaxiTrackerContent() {
 		if (!state.currentShift) return 13 * 3600;
 		const elapsed = Math.max(
 			0,
-			Math.round((nowSec * 1000 - state.currentShift.startTs) / 1000)
+			Math.round((nowSec * 1000 - state.currentShift.startTs) / 1000),
 		);
 		return Math.max(0, 13 * 3600 - elapsed);
 	}, [state.currentShift, nowSec]);
@@ -323,11 +371,9 @@ function TaxiTrackerContent() {
 						size="icon"
 						className="rounded-full"
 					>
-						{theme === "dark" ? (
+						{theme === "dark" ?
 							<Sun className="h-5 w-5" />
-						) : (
-							<Moon className="h-5 w-5" />
-						)}
+						:	<Moon className="h-5 w-5" />}
 					</Button>
 				</header>
 
@@ -348,9 +394,10 @@ function TaxiTrackerContent() {
 					onPlatformChange={setPlatform}
 					onAddFare={addFare}
 					disabled={!state.currentShift}
-					busySeconds={currentBusySeconds()} // 👈 NEW
-					busyActive={Boolean(state.currentShift?.busyStartTs)} // 👈 NEW
-					onToggleBusy={toggleBusy} // 👈 NEW
+					busySeconds={currentBusySeconds()}
+					busyActive={Boolean(state.currentShift?.busyStartTs)}
+					onToggleBusy={toggleBusy}
+					onApplyManualBusy={applyManualBusy} // 👈 NEW
 				/>
 
 				{/* Summary */}
@@ -371,7 +418,7 @@ function TaxiTrackerContent() {
 
 				<ShiftHistoryCard
 					history={[...state.history].sort(
-						(a, b) => b.startTs - a.startTs
+						(a, b) => b.startTs - a.startTs,
 					)}
 					onExportCSV={handleExportCSV}
 					onClearHistory={clearHistory}

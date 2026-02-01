@@ -14,6 +14,8 @@ interface SummaryCardProps {
 	onEditFare: (fare: Fare) => void;
 	onDeleteFare: (fareId: string) => void;
 	onTargetChange?: (newTarget: number) => void;
+	onApplyManualBusy?: (hhmm: string) => void;
+
 }
 
 export function SummaryCard({

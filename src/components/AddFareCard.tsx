@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,6 +21,17 @@ const secondsToHMS = (seconds: number) => {
 	)}m ${String(s).padStart(2, "0")}s`;
 };
 
+function parseHHMM(input: string) {
+	const match = /^(\d{1,2}):(\d{2})$/.exec(input);
+	if (!match) return null;
+
+	const h = Number(match[1]);
+	const m = Number(match[2]);
+	if (m >= 60) return null;
+
+	return h * 3600 + m * 60;
+}
+
 interface AddFareCardProps {
 	fareInput: string;
 	platform: string;
@@ -28,10 +40,13 @@ interface AddFareCardProps {
 	onAddFare: () => void;
 	disabled: boolean;
 
-	// NEW for busy tracking
-	busySeconds?: number;
-	busyActive?: boolean;
-	onToggleBusy?: () => void;
+	// Busy tracking
+	busySeconds: number;
+	busyActive: boolean;
+	onToggleBusy: () => void;
+
+	// ✅ manual busy add (seconds)
+	onSetBusySeconds: (seconds: number) => void;
 }
 
 export function AddFareCard({
@@ -41,10 +56,20 @@ export function AddFareCard({
 	onPlatformChange,
 	onAddFare,
 	disabled,
-	busySeconds = 0,
-	busyActive = false,
+	busySeconds,
+	busyActive,
 	onToggleBusy,
+	onSetBusySeconds,
 }: AddFareCardProps) {
+	const [manualBusy, setManualBusy] = useState("");
+
+	const handleAddManualBusy = () => {
+		const seconds = parseHHMM(manualBusy);
+		if (seconds === null) return;
+		onSetBusySeconds(seconds);
+		setManualBusy("");
+	};
+
 	const handleKeyPress = (e: React.KeyboardEvent) => {
 		if (e.key === "Enter" && !disabled) {
 			onAddFare();
@@ -54,13 +79,13 @@ export function AddFareCard({
 	return (
 		<Card>
 			<CardHeader>
-				{/* Busy / Vacancy toggle + busy time */}
+				{/* Busy / Vacancy */}
 				<div className="flex items-center gap-2">
 					<Button
 						type="button"
 						onClick={onToggleBusy}
-						disabled={disabled || !onToggleBusy}
-						className={`flex-1 h-12 text-base font-semibold flex items-center justify-center ${
+						disabled={disabled}
+						className={`flex-1 h-12 text-base font-semibold ${
 							busyActive
 								? "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
 								: "bg-green-600 hover:bg-green-600/90 text-white"
@@ -69,19 +94,40 @@ export function AddFareCard({
 						{busyActive ? "Busy" : "Vacancy"}
 					</Button>
 
-					<div className="h-12 w-[95px] bg-muted rounded-lg flex flex-col items-center justify-center">
-						<div className="text-[10px] text-muted-foreground leading-none mb-[2px]">
+					<div className="h-12 w-[110px] bg-muted rounded-lg flex flex-col items-center justify-center">
+						<div className="text-[10px] text-muted-foreground">
 							Busy Time
 						</div>
-						<div className="font-semibold text-sm leading-none">
+						<div className="font-semibold text-sm">
 							{secondsToHMS(busySeconds)}
 						</div>
 					</div>
 				</div>
+
+				{/* Manual busy input */}
+				<div className="flex gap-2 mt-2">
+					<Input
+						value={manualBusy}
+						onChange={(e) => setManualBusy(e.target.value)}
+						placeholder="HH:MM"
+						className="h-10"
+						disabled={disabled}
+					/>
+					<Button
+						type="button"
+						variant="outline"
+						className="h-10"
+						disabled={disabled || !manualBusy}
+						onClick={handleAddManualBusy}
+					>
+						+ Add
+					</Button>
+				</div>
 			</CardHeader>
+
 			<CardContent>
 				<div className="flex flex-col gap-3">
-					{/* Amount + platform */}
+					{/* Fare input */}
 					<div className="flex gap-2">
 						<Input
 							value={fareInput}
@@ -111,11 +157,10 @@ export function AddFareCard({
 						</Select>
 					</div>
 
-					{/* Add fare */}
 					<Button
 						onClick={onAddFare}
 						disabled={disabled}
-						className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+						className="w-full"
 					>
 						<Plus className="h-4 w-4 mr-2" />
 						Add Fare
