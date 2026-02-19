@@ -14,17 +14,20 @@ interface CurrentShiftCardProps {
 	onCancelShift: () => void;
 }
 
-const secondsToHM = (seconds: number) => {
-	const h = Math.floor(Math.max(0, seconds) / 3600);
-	const m = Math.floor((Math.max(0, seconds) % 3600) / 60);
+// Moved outside to prevent re-declaration on every render
+const formatRemaining = (seconds: number) => {
+	const safeSec = Math.max(0, seconds);
+	const h = Math.floor(safeSec / 3600);
+	const m = Math.floor((safeSec % 3600) / 60);
 	return `${h}h ${m}m`;
 };
 
-const workingTimer = (seconds: number) => {
-	const h = Math.floor(seconds / 3600);
-	const m = Math.floor((seconds % 3600) / 60);
-	const s = seconds % 60;
-	return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+const formatDuration = (seconds: number) => {
+	const safeSec = Math.max(0, seconds);
+	const h = Math.floor(safeSec / 3600);
+	const m = Math.floor((safeSec % 3600) / 60);
+	const s = safeSec % 60;
+	return [h, m, s].map((v) => String(v).padStart(2, "0")).join(":");
 };
 
 export function CurrentShiftCard({
@@ -36,8 +39,9 @@ export function CurrentShiftCard({
 	onEndShift,
 	onCancelShift,
 }: CurrentShiftCardProps) {
+	// Logic remains clean and reactive
 	const isWarning = remainingSeconds < 3600;
-	const isUrgent = remainingSeconds < 1800; // 30 mins
+	const isUrgent = remainingSeconds < 1800;
 
 	const remainingClass =
 		isUrgent ? "text-destructive animate-pulse"
@@ -53,7 +57,7 @@ export function CurrentShiftCard({
 						Shift Control
 					</CardTitle>
 					<div
-						className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black tracking-tighter uppercase transition-colors ${
+						className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase transition-colors ${
 							currentShift ?
 								"bg-emerald-500/10 text-emerald-500"
 							:	"bg-muted text-muted-foreground"
@@ -70,21 +74,19 @@ export function CurrentShiftCard({
 			<CardContent className="pt-6">
 				{currentShift ?
 					<div className="space-y-6">
-						{/* Massive Timer Display */}
 						<div className="text-center space-y-1">
 							<span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-								Shift Duration
+								Duration
 							</span>
 							<div className="text-5xl font-black tabular-nums tracking-tighter text-foreground drop-shadow-sm">
-								{workingTimer(elapsedSeconds)}
+								{formatDuration(elapsedSeconds)}
 							</div>
 						</div>
 
-						{/* Shift Stats Grid */}
 						<div className="grid grid-cols-2 gap-3">
 							<div className="p-3 bg-muted/40 rounded-2xl border border-border/50">
 								<span className="text-[10px] font-bold uppercase text-muted-foreground block mb-1">
-									Started At
+									Started
 								</span>
 								<div className="flex items-center gap-2 font-bold text-sm">
 									<Clock className="h-3.5 w-3.5 text-primary" />
@@ -99,17 +101,16 @@ export function CurrentShiftCard({
 									className={`flex items-center gap-2 font-black text-sm ${remainingClass}`}
 								>
 									<AlertCircle className="h-3.5 w-3.5" />
-									{secondsToHM(remainingSeconds)}
+									{formatRemaining(remainingSeconds)}
 								</div>
 							</div>
 						</div>
 
-						{/* Main Actions */}
 						<div className="flex gap-3">
 							<Button
 								onClick={onEndShift}
 								size="lg"
-								className="flex-[2] h-14 rounded-2xl bg-destructive hover:bg-destructive/90 text-destructive-foreground font-black uppercase tracking-tight gap-2 shadow-lg shadow-destructive/20"
+								className="flex-[2] h-14 rounded-2xl bg-destructive hover:bg-destructive/90 text-white font-black uppercase gap-2 shadow-lg shadow-destructive/20"
 							>
 								<Square className="h-4 w-4 fill-current" />
 								End Shift
@@ -129,7 +130,7 @@ export function CurrentShiftCard({
 							<Button
 								onClick={onStartShift}
 								size="lg"
-								className="h-14 rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-tight gap-2 shadow-lg shadow-primary/20"
+								className="h-14 rounded-2xl bg-primary text-primary-foreground font-black uppercase gap-2 shadow-lg shadow-primary/20"
 							>
 								<Play className="h-4 w-4 fill-current" />
 								Start Shift Now
@@ -140,7 +141,7 @@ export function CurrentShiftCard({
 								className="h-10 rounded-xl font-bold text-muted-foreground hover:text-foreground gap-2"
 							>
 								<History className="h-4 w-4" />
-								Use Custom Start Time
+								Custom Start Time
 							</Button>
 						</div>
 					</div>
