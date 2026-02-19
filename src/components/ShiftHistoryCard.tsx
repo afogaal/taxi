@@ -1,61 +1,51 @@
 const onExportCSV = () => {
-	if (history.length === 0) return;
+  if (!Array.isArray(history) || history.length === 0) return;
 
-	// 1. Clean Headers - Professional names for Excel
-	const headers = [
-		"Date",
-		"Shift Start",
-		"Shift End",
-		"Shift Hours", // Replaces 'seconds'
-		"Trips",
-		"Earnings (kr)",
-		"Busy Hours", // Replaces 'busy seconds'
-		"Platform Summary",
-	];
+  // 1. Headers with friendly names
+  const headers = [
+    "Date",
+    "Shift Start",
+    "Shift End",
+    "Shift Duration", // human-readable instead of raw seconds
+    "Trips",
+    "Earnings (kr)",
+    "Busy Duration", // human-readable busy time
+    "Platform Summary",
+  ];
 
-	// 2. Format Rows with proper time conversion
-	const rows = history.map((h) => {
-		// Format the platform breakdown into a single string: "Uber: 500, Bolt: 300"
-		const platforms =
-			h.platformSummary ?
-				Object.entries(h.platformSummary)
-					.filter(([, v]) => v.total > 0)
-					.map(([name, data]) => `${name}: ${data.total.toFixed(0)}`)
-					.join(" | ")
-			:	"";
+  // 2. Rows formatting
+  const rows = history.map((h) => {
+    const platforms = h.platformSummary
+      ? Object.entries(h.platformSummary)
+          .filter(([, v]) => v.total > 0)
+          .map(([name, data]) => `${name}: ${data.total.toFixed(0)}`)
+          .join(" | ")
+      : "";
 
-		return [
-			formatDate(h.startTs),
-			formatTimeOnly(h.startTs),
-			formatTimeOnly(h.endTs),
-			secondsToHM(h.seconds), // Convert shift seconds to "8h 30m"
-			h.trips,
-			h.earnings.toFixed(2),
-			h.busySeconds ? secondsToHM(h.busySeconds) : "0h 0m", // Convert busy seconds
-			platforms,
-		];
-	});
+    return [
+      formatDate(h.startTs),
+      formatTimeOnly(h.startTs),
+      formatTimeOnly(h.endTs),
+      secondsToHM(h.seconds ?? 0),           // shift duration in hh:mm
+      h.trips ?? 0,
+      (h.earnings ?? 0).toFixed(2),
+      secondsToHM(h.busySeconds ?? 0),      // busy duration in hh:mm
+      platforms,
+    ];
+  });
 
-	// 3. Build CSV with UTF-8 BOM and Quotes
-	const csvContent = [
-		headers.join(","),
-		...rows.map((row) => row.map((value) => `"${value}"`).join(",")),
-	].join("\n");
+  // 3. Build CSV content
+  const csvContent = [
+    headers.join(","), 
+    ...rows.map((row) => row.map((v) => `"${v}"`).join(",")),
+  ].join("\n");
 
-	const blob = new Blob(["\uFEFF" + csvContent], {
-		type: "text/csv;charset=utf-8;",
-	});
-
-	// 4. Download Trigger
-	const link = document.createElement("a");
-	const url = URL.createObjectURL(blob);
-	link.setAttribute("href", url);
-	link.setAttribute(
-		"download",
-		`Taxi_Shift_Report_${new Date().toISOString().split("T")[0]}.csv`,
-	);
-	link.style.visibility = "hidden";
-	document.body.appendChild(link);
-	link.click();
-	document.body.removeChild(link);
+  // 4. Download CSV
+  const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `Taxi_Shift_Report_${new Date().toISOString().split("T")[0]}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
