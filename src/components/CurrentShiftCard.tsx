@@ -6,7 +6,6 @@ import {
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
-	DialogDescription,
 } from "@/components/ui/dialog";
 import { CurrentShift } from "@/types/tracker";
 import { formatTime } from "@/utils/timeUtils";
@@ -22,7 +21,7 @@ import {
 } from "lucide-react";
 
 // --- CONSTANTS ---
-const MY_PIN = "20267";
+const MY_PIN = "0000";
 
 // --- HELPERS ---
 const formatDuration = (seconds: number) => {
@@ -53,12 +52,12 @@ function PinModal({ isOpen, onClose, onSuccess, title }: PinModalProps) {
 	const [error, setError] = useState(false);
 
 	const handleNumberClick = (num: string) => {
-		if (pin.length < 5) {
+		if (pin.length < 4) {
 			const newPin = pin + num;
 			setPin(newPin);
 
-			// Auto-check when 5th digit is entered
-			if (newPin.length === 5) {
+			// Auto-check when 4th digit is entered
+			if (newPin.length === 4) {
 				if (newPin === MY_PIN) {
 					onSuccess();
 					handleClose();
@@ -85,7 +84,7 @@ function PinModal({ isOpen, onClose, onSuccess, title }: PinModalProps) {
 				<DialogHeader className="space-y-2">
 					<div className="mx-auto p-3 bg-primary/10 rounded-full w-fit">
 						<Lock
-							className={`h-5 w-5 ${error ? "text-destructive animate-pulse" : "text-primary"}`}
+							className={`h-5 w-5 ${error ? "text-destructive animate-bounce" : "text-primary"}`}
 						/>
 					</div>
 					<DialogTitle className="text-center text-lg font-black uppercase tracking-tight">
@@ -93,12 +92,12 @@ function PinModal({ isOpen, onClose, onSuccess, title }: PinModalProps) {
 					</DialogTitle>
 				</DialogHeader>
 
-				{/* PIN Dots Display */}
-				<div className="flex justify-center gap-3 my-8">
-					{[...Array(5)].map((_, i) => (
+				{/* Progress Dots (Now 4 dots) */}
+				<div className="flex justify-center gap-4 my-8">
+					{[...Array(4)].map((_, i) => (
 						<div
 							key={i}
-							className={`h-3 w-3 rounded-full border-2 transition-all duration-150 ${
+							className={`h-3.5 w-3.5 rounded-full border-2 transition-all duration-150 ${
 								pin.length > i ?
 									"bg-primary border-primary scale-125"
 								:	"border-muted-foreground/20"
@@ -107,7 +106,6 @@ function PinModal({ isOpen, onClose, onSuccess, title }: PinModalProps) {
 					))}
 				</div>
 
-				{/* Keypad Grid */}
 				<div className="grid grid-cols-3 gap-4">
 					{[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
 						<Button
@@ -170,8 +168,8 @@ export function CurrentShiftCard({
 		title: "",
 	});
 
-	const isWarning = remainingSeconds < 3600;
 	const isUrgent = remainingSeconds < 1800;
+	const isWarning = remainingSeconds < 3600;
 
 	const remainingClass =
 		isUrgent ? "text-destructive animate-pulse"
@@ -253,7 +251,12 @@ export function CurrentShiftCard({
 									End Shift
 								</Button>
 								<Button
-									onClick={onCancelShift}
+									onClick={() =>
+										requestPin(
+											onCancelShift,
+											"Confirm Cancel",
+										)
+									}
 									variant="outline"
 									className="flex-1 h-16 rounded-2xl font-bold uppercase text-[10px] border-2"
 								>
