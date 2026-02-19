@@ -167,7 +167,7 @@ export function AddFareCard({
                         className="w-full h-14 text-sm font-black tracking-widest gap-2 rounded-2xl shadow-xl shadow-primary/10 active:scale-[0.98] transition-all bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
                     >
                         <Plus className="h-5 w-5 stroke-[3]" />
-                        SUBMIT FARE
+                        ADD FARE
                     </Button>
                 </div>
             </CardContent>
