@@ -27,24 +27,17 @@ import {
 	Lock,
 	Delete,
 	Calendar as CalendarIcon,
+	ChevronLeft,
 } from "lucide-react";
 
 const MY_PIN = "0000";
 
-// --- HELPERS ---
-const formatDuration = (seconds: number) => {
-	const safeSec = Math.max(0, seconds);
-	const h = Math.floor(safeSec / 3600);
-	const m = Math.floor((safeSec % 3600) / 60);
-	const s = safeSec % 60;
-	return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-};
-
-const formatRemaining = (seconds: number) => {
-	const safeSec = Math.max(0, seconds);
-	const h = Math.floor(safeSec / 3600);
-	const m = Math.floor((safeSec % 3600) / 60);
-	return `${h}h ${m}m`;
+// --- FORMATTING HELPERS ---
+const formatDuration = (s: number) => {
+	const h = Math.floor(Math.max(0, s) / 3600);
+	const m = Math.floor((Math.max(0, s) % 3600) / 60);
+	const sec = Math.max(0, s) % 60;
+	return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 };
 
 // --- PIN MODAL ---
@@ -158,7 +151,7 @@ export function CurrentShiftCard({
 	});
 	const [showCustomPicker, setShowCustomPicker] = useState(false);
 
-	// Custom Start States
+	// Custom States for the Internal Picker
 	const [selectedDate, setSelectedDate] = useState<Date | undefined>(
 		new Date(),
 	);
@@ -166,19 +159,15 @@ export function CurrentShiftCard({
 		format(new Date(), "HH:mm"),
 	);
 
-	const handleCustomSubmit = () => {
+	const handleConfirmCustom = () => {
 		if (!selectedDate) return;
 		const [hours, minutes] = selectedTime.split(":").map(Number);
 		const finalDate = new Date(selectedDate);
-		finalDate.setHours(hours, minutes);
+		finalDate.setHours(hours, minutes, 0, 0);
 
-		// Pass the calculated timestamp back
+		// Execute the actual start logic with the new timestamp
 		onStartShiftCustom(finalDate.getTime());
 		setShowCustomPicker(false);
-	};
-
-	const requestPin = (action: () => void, title: string) => {
-		setPinConfig({ isOpen: true, action, title });
 	};
 
 	return (
@@ -203,6 +192,7 @@ export function CurrentShiftCard({
 
 				<CardContent className="pt-8">
 					{currentShift ?
+						/* --- ACTIVE SHIFT UI --- */
 						<div className="space-y-8">
 							<div className="text-center">
 								<span className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60">
@@ -224,20 +214,30 @@ export function CurrentShiftCard({
 								</div>
 								<div className="p-4 bg-muted/30 rounded-[1.5rem] border border-border/40">
 									<span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">
-										Remaining
+										Target
 									</span>
 									<div
 										className={`flex items-center gap-2 font-black text-sm ${remainingSeconds < 1800 ? "text-destructive animate-pulse" : "text-emerald-500"}`}
 									>
 										<AlertCircle className="h-3.5 w-3.5" />
-										{formatRemaining(remainingSeconds)}
+										{Math.floor(
+											remainingSeconds / 3600,
+										)}h{" "}
+										{Math.floor(
+											(remainingSeconds % 3600) / 60,
+										)}
+										m
 									</div>
 								</div>
 							</div>
 							<div className="flex gap-3">
 								<Button
 									onClick={() =>
-										requestPin(onEndShift, "End Session")
+										setPinConfig({
+											isOpen: true,
+											action: onEndShift,
+											title: "End Session",
+										})
 									}
 									size="lg"
 									className="flex-[2] h-16 rounded-2xl bg-destructive hover:bg-destructive/90 text-white font-black uppercase tracking-wider shadow-xl shadow-destructive/20"
@@ -247,10 +247,11 @@ export function CurrentShiftCard({
 								</Button>
 								<Button
 									onClick={() =>
-										requestPin(
-											onCancelShift,
-											"Confirm Cancel",
-										)
+										setPinConfig({
+											isOpen: true,
+											action: onCancelShift,
+											title: "Confirm Cancel",
+										})
 									}
 									variant="outline"
 									className="flex-1 h-16 rounded-2xl font-bold uppercase text-[10px] border-2"
@@ -259,15 +260,17 @@ export function CurrentShiftCard({
 								</Button>
 							</div>
 						</div>
-					:	<div className="space-y-4 py-4">
+					:	/* --- IDLE / PICKER UI --- */
+						<div className="space-y-4 py-4">
 							{!showCustomPicker ?
 								<>
 									<Button
 										onClick={() =>
-											requestPin(
-												onStartShift,
-												"Initialize Shift",
-											)
+											setPinConfig({
+												isOpen: true,
+												action: onStartShift,
+												title: "Initialize Shift",
+											})
 										}
 										size="lg"
 										className="w-full h-16 rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-widest shadow-xl shadow-primary/20"
@@ -277,10 +280,12 @@ export function CurrentShiftCard({
 									</Button>
 									<Button
 										onClick={() =>
-											requestPin(
-												() => setShowCustomPicker(true),
-												"Unlock Custom",
-											)
+											setPinConfig({
+												isOpen: true,
+												action: () =>
+													setShowCustomPicker(true),
+												title: "Unlock Custom",
+											})
 										}
 										variant="ghost"
 										className="w-full h-12 rounded-xl font-bold text-muted-foreground hover:text-foreground gap-2"
@@ -289,19 +294,19 @@ export function CurrentShiftCard({
 										Custom Start Time
 									</Button>
 								</>
-							:	<div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
-									<div className="flex flex-col gap-2">
+							:	<div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+									<div className="space-y-3">
 										<label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">
-											Pick Start Date & Time
+											Set Historical Start
 										</label>
-										<div className="flex gap-2">
+										<div className="flex flex-col gap-3">
 											<Popover>
 												<PopoverTrigger asChild>
 													<Button
 														variant="outline"
-														className="flex-1 h-12 rounded-xl justify-start font-bold border-2"
+														className="w-full h-14 rounded-2xl justify-start font-bold border-2 text-lg"
 													>
-														<CalendarIcon className="mr-2 h-4 w-4" />
+														<CalendarIcon className="mr-3 h-5 w-5 text-primary" />
 														{selectedDate ?
 															format(
 																selectedDate,
@@ -310,7 +315,10 @@ export function CurrentShiftCard({
 														:	"Pick Date"}
 													</Button>
 												</PopoverTrigger>
-												<PopoverContent className="w-auto p-0 rounded-2xl border-none shadow-2xl">
+												<PopoverContent
+													className="w-auto p-0 rounded-3xl border-none shadow-2xl"
+													align="center"
+												>
 													<Calendar
 														mode="single"
 														selected={selectedDate}
@@ -321,32 +329,36 @@ export function CurrentShiftCard({
 													/>
 												</PopoverContent>
 											</Popover>
-											<Input
-												type="time"
-												value={selectedTime}
-												onChange={(e) =>
-													setSelectedTime(
-														e.target.value,
-													)
-												}
-												className="w-[120px] h-12 rounded-xl border-2 font-bold"
-											/>
+											<div className="relative">
+												<Clock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+												<Input
+													type="time"
+													value={selectedTime}
+													onChange={(e) =>
+														setSelectedTime(
+															e.target.value,
+														)
+													}
+													className="w-full h-14 rounded-2xl border-2 pl-12 text-lg font-bold"
+												/>
+											</div>
 										</div>
 									</div>
-									<div className="flex gap-2">
+									<div className="flex gap-3">
 										<Button
-											onClick={handleCustomSubmit}
-											className="flex-1 h-12 rounded-xl font-black uppercase"
+											onClick={handleConfirmCustom}
+											className="flex-[2] h-14 rounded-2xl font-black uppercase tracking-widest shadow-lg"
 										>
-											Confirm
+											Confirm Start
 										</Button>
 										<Button
 											onClick={() =>
 												setShowCustomPicker(false)
 											}
 											variant="ghost"
-											className="h-12 px-4 rounded-xl font-bold"
+											className="flex-1 h-14 rounded-2xl font-bold text-muted-foreground"
 										>
+											<ChevronLeft className="h-4 w-4 mr-1" />
 											Back
 										</Button>
 									</div>
@@ -378,25 +390,17 @@ import { CurrentShift } from "@/types/tracker";
 import { formatTime } from "@/utils/timeUtils";
 import { 
     Clock, Play, Square, Timer, History, 
-    AlertCircle, Lock, Delete, Calendar as CalendarIcon 
+    AlertCircle, Lock, Delete, Calendar as CalendarIcon, ChevronLeft 
 } from "lucide-react";
 
 const MY_PIN = "0000";
 
-// --- HELPERS ---
-const formatDuration = (seconds: number) => {
-    const safeSec = Math.max(0, seconds);
-    const h = Math.floor(safeSec / 3600);
-    const m = Math.floor((safeSec % 3600) / 60);
-    const s = safeSec % 60;
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-};
-
-const formatRemaining = (seconds: number) => {
-    const safeSec = Math.max(0, seconds);
-    const h = Math.floor(safeSec / 3600);
-    const m = Math.floor((safeSec % 3600) / 60);
-    return `${h}h ${m}m`;
+// --- FORMATTING HELPERS ---
+const formatDuration = (s: number) => {
+    const h = Math.floor(Math.max(0, s) / 3600);
+    const m = Math.floor((Math.max(0, s) % 3600) / 60);
+    const sec = Math.max(0, s) % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 };
 
 // --- PIN MODAL ---
@@ -461,23 +465,19 @@ export function CurrentShiftCard({
     const [pinConfig, setPinConfig] = useState<any>({ isOpen: false, action: null, title: "" });
     const [showCustomPicker, setShowCustomPicker] = useState(false);
     
-    // Custom Start States
+    // Custom States for the Internal Picker
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
     const [selectedTime, setSelectedTime] = useState(format(new Date(), "HH:mm"));
 
-    const handleCustomSubmit = () => {
+    const handleConfirmCustom = () => {
         if (!selectedDate) return;
         const [hours, minutes] = selectedTime.split(":").map(Number);
         const finalDate = new Date(selectedDate);
-        finalDate.setHours(hours, minutes);
+        finalDate.setHours(hours, minutes, 0, 0);
         
-        // Pass the calculated timestamp back
+        // Execute the actual start logic with the new timestamp
         onStartShiftCustom(finalDate.getTime());
         setShowCustomPicker(false);
-    };
-
-    const requestPin = (action: () => void, title: string) => {
-        setPinConfig({ isOpen: true, action, title });
     };
 
     return (
@@ -497,6 +497,7 @@ export function CurrentShiftCard({
 
                 <CardContent className="pt-8">
                     {currentShift ? (
+                        /* --- ACTIVE SHIFT UI --- */
                         <div className="space-y-8">
                             <div className="text-center">
                                 <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60">Session Time</span>
@@ -508,49 +509,56 @@ export function CurrentShiftCard({
                                     <div className="flex items-center gap-2 font-bold text-sm"><Clock className="h-3.5 w-3.5 text-primary/70" />{formatTime(currentShift.startTs)}</div>
                                 </div>
                                 <div className="p-4 bg-muted/30 rounded-[1.5rem] border border-border/40">
-                                    <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">Remaining</span>
-                                    <div className={`flex items-center gap-2 font-black text-sm ${remainingSeconds < 1800 ? "text-destructive animate-pulse" : "text-emerald-500"}`}><AlertCircle className="h-3.5 w-3.5" />{formatRemaining(remainingSeconds)}</div>
+                                    <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground block mb-1">Target</span>
+                                    <div className={`flex items-center gap-2 font-black text-sm ${remainingSeconds < 1800 ? "text-destructive animate-pulse" : "text-emerald-500"}`}>
+                                        <AlertCircle className="h-3.5 w-3.5" />
+                                        {Math.floor(remainingSeconds / 3600)}h {Math.floor((remainingSeconds % 3600) / 60)}m
+                                    </div>
                                 </div>
                             </div>
                             <div className="flex gap-3">
-                                <Button onClick={() => requestPin(onEndShift, "End Session")} size="lg" className="flex-[2] h-16 rounded-2xl bg-destructive hover:bg-destructive/90 text-white font-black uppercase tracking-wider shadow-xl shadow-destructive/20"><Square className="h-4 w-4 fill-current mr-2" />End Shift</Button>
-                                <Button onClick={() => requestPin(onCancelShift, "Confirm Cancel")} variant="outline" className="flex-1 h-16 rounded-2xl font-bold uppercase text-[10px] border-2">Cancel</Button>
+                                <Button onClick={() => setPinConfig({ isOpen: true, action: onEndShift, title: "End Session" })} size="lg" className="flex-[2] h-16 rounded-2xl bg-destructive hover:bg-destructive/90 text-white font-black uppercase tracking-wider shadow-xl shadow-destructive/20"><Square className="h-4 w-4 fill-current mr-2" />End Shift</Button>
+                                <Button onClick={() => setPinConfig({ isOpen: true, action: onCancelShift, title: "Confirm Cancel" })} variant="outline" className="flex-1 h-16 rounded-2xl font-bold uppercase text-[10px] border-2">Cancel</Button>
                             </div>
                         </div>
                     ) : (
+                        /* --- IDLE / PICKER UI --- */
                         <div className="space-y-4 py-4">
                             {!showCustomPicker ? (
                                 <>
-                                    <Button onClick={() => requestPin(onStartShift, "Initialize Shift")} size="lg" className="w-full h-16 rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-widest shadow-xl shadow-primary/20"><Play className="h-4 w-4 fill-current mr-2" />Start Tracking</Button>
-                                    <Button onClick={() => requestPin(() => setShowCustomPicker(true), "Unlock Custom")} variant="ghost" className="w-full h-12 rounded-xl font-bold text-muted-foreground hover:text-foreground gap-2"><History className="h-4 w-4" />Custom Start Time</Button>
+                                    <Button onClick={() => setPinConfig({ isOpen: true, action: onStartShift, title: "Initialize Shift" })} size="lg" className="w-full h-16 rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-widest shadow-xl shadow-primary/20"><Play className="h-4 w-4 fill-current mr-2" />Start Tracking</Button>
+                                    <Button onClick={() => setPinConfig({ isOpen: true, action: () => setShowCustomPicker(true), title: "Unlock Custom" })} variant="ghost" className="w-full h-12 rounded-xl font-bold text-muted-foreground hover:text-foreground gap-2"><History className="h-4 w-4" />Custom Start Time</Button>
                                 </>
                             ) : (
-                                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Pick Start Date & Time</label>
-                                        <div className="flex gap-2">
+                                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Set Historical Start</label>
+                                        <div className="flex flex-col gap-3">
                                             <Popover>
                                                 <PopoverTrigger asChild>
-                                                    <Button variant="outline" className="flex-1 h-12 rounded-xl justify-start font-bold border-2">
-                                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                                    <Button variant="outline" className="w-full h-14 rounded-2xl justify-start font-bold border-2 text-lg">
+                                                        <CalendarIcon className="mr-3 h-5 w-5 text-primary" />
                                                         {selectedDate ? format(selectedDate, "PPP") : "Pick Date"}
                                                     </Button>
                                                 </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0 rounded-2xl border-none shadow-2xl">
+                                                <PopoverContent className="w-auto p-0 rounded-3xl border-none shadow-2xl" align="center">
                                                     <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus />
                                                 </PopoverContent>
                                             </Popover>
-                                            <Input 
-                                                type="time" 
-                                                value={selectedTime} 
-                                                onChange={(e) => setSelectedTime(e.target.value)}
-                                                className="w-[120px] h-12 rounded-xl border-2 font-bold"
-                                            />
+                                            <div className="relative">
+                                                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+                                                <Input 
+                                                    type="time" 
+                                                    value={selectedTime} 
+                                                    onChange={(e) => setSelectedTime(e.target.value)}
+                                                    className="w-full h-14 rounded-2xl border-2 pl-12 text-lg font-bold"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <Button onClick={handleCustomSubmit} className="flex-1 h-12 rounded-xl font-black uppercase">Confirm</Button>
-                                        <Button onClick={() => setShowCustomPicker(false)} variant="ghost" className="h-12 px-4 rounded-xl font-bold">Back</Button>
+                                    <div className="flex gap-3">
+                                        <Button onClick={handleConfirmCustom} className="flex-[2] h-14 rounded-2xl font-black uppercase tracking-widest shadow-lg">Confirm Start</Button>
+                                        <Button onClick={() => setShowCustomPicker(false)} variant="ghost" className="flex-1 h-14 rounded-2xl font-bold text-muted-foreground"><ChevronLeft className="h-4 w-4 mr-1" />Back</Button>
                                     </div>
                                 </div>
                             )}
@@ -559,7 +567,12 @@ export function CurrentShiftCard({
                 </CardContent>
             </Card>
 
-            <PinModal isOpen={pinConfig.isOpen} onClose={() => setPinConfig({ ...pinConfig, isOpen: false })} onSuccess={() => pinConfig.action?.()} title={pinConfig.title} />
+            <PinModal 
+                isOpen={pinConfig.isOpen} 
+                onClose={() => setPinConfig({ ...pinConfig, isOpen: false })} 
+                onSuccess={() => pinConfig.action?.()} 
+                title={pinConfig.title} 
+            />
         </>
     );
 }
