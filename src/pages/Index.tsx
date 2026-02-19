@@ -61,26 +61,25 @@ function TaxiTrackerContent() {
 		toast.success("Shift started!");
 	}, [state.currentShift]);
 
-	const startShiftCustom = useCallback(() => {
-		const manual = prompt("Enter start time (YYYY-MM-DD HH:MM):");
-		if (!manual) return;
-		const parsed = new Date(manual);
-		if (isNaN(parsed.getTime())) {
-			alert("Could not parse that date. Use format: 2025-10-16 08:30");
-			return;
-		}
-		setState((s) => ({
-			...s,
-			currentShift: {
-				startTs: parsed.getTime(),
-				fares: [],
-				trips: 0,
-				busyStartTs: null,
-				busySeconds: 0,
-			},
-		}));
-		toast.success("Shift started with custom time!");
-	}, []);
+	const startShiftCustom = useCallback(
+		(customTimestamp: number) => {
+			if (state.currentShift) return;
+
+			setState((s) => ({
+				...s,
+				currentShift: {
+					startTs: customTimestamp,
+					fares: [],
+					trips: 0,
+					busyStartTs: null,
+					busySeconds: 0,
+				},
+			}));
+
+			toast.success("Shift started with custom time!");
+		},
+		[state.currentShift],
+	);
 
 	const currentBusySeconds = useCallback(() => {
 		if (!state.currentShift) return 0;

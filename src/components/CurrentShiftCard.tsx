@@ -63,14 +63,14 @@ export function CurrentShiftCard({
                                         onClick={() => setPinConfig({ isOpen: true, action: onStartShift, title: "Start Shift" })} 
                                         className="w-full h-16 rounded-2xl bg-primary text-primary-foreground font-black uppercase shadow-xl"
                                     >
-                                        <Play className="mr-2 h-4 w-4 fill-current" /> Start Tracking
+                                        <Play className="mr-2 h-4 w-4 fill-current" /> Start Shift
                                     </Button>
                                     <Button 
                                         onClick={() => setPinConfig({ isOpen: true, action: () => setShowCustomPicker(true), title: "Unlock Custom" })} 
                                         variant="ghost" 
                                         className="w-full h-12 rounded-xl font-bold text-muted-foreground"
                                     >
-                                        <History className="mr-2 h-4 w-4" /> Custom Start Time
+                                        <History className="mr-2 h-4 w-4" /> Custom Start Shift
                                     </Button>
                                 </>
                             ) : (
