@@ -56,6 +56,8 @@ export function AddFareCard({
     // Logical Lock States
     const isFareDisabled = disabled || busyActive;
     const isManualBusyDisabled = disabled || busyActive;
+    // Button specific: Dim if Busy is active OR if input is empty
+    const isAddButtonDisabled = isManualBusyDisabled || !manualBusy;
 
     const handleManualBusyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let value = e.target.value.replace(/\D/g, "");
@@ -95,7 +97,7 @@ export function AddFareCard({
                     </Button>
                 </div>
 
-                {/* 2. BUSY DATA ROW - Manual entry disabled during live Busy Mode */}
+                {/* 2. BUSY DATA ROW */}
                 <div className="flex items-center justify-between gap-3 bg-muted/30 px-3 py-2.5 rounded-2xl border border-border/40">
                     <div className="flex flex-col">
                         <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60 flex items-center gap-1">
@@ -106,7 +108,7 @@ export function AddFareCard({
                         </span>
                     </div>
                     
-                    <div className={`flex items-center gap-1 bg-background/50 p-1 rounded-xl border border-border/50 shadow-inner transition-opacity ${isManualBusyDisabled ? 'opacity-40' : 'opacity-100'}`}>
+                    <div className={`flex items-center gap-1 bg-background/50 p-1 rounded-xl border border-border/50 shadow-inner transition-all duration-300 ${isManualBusyDisabled ? 'opacity-40 grayscale' : 'opacity-100'}`}>
                         <Input
                             placeholder="MM:SS"
                             className="h-7 w-14 text-[11px] text-center border-none focus-visible:ring-0 p-0 font-bold bg-transparent"
@@ -118,16 +120,20 @@ export function AddFareCard({
                         <Button 
                             size="sm" 
                             variant="secondary" 
-                            className="h-7 px-2.5 text-[9px] font-black rounded-lg bg-primary text-primary-foreground hover:opacity-90 disabled:bg-muted disabled:text-muted-foreground"
                             onClick={handleAddManualBusy}
-                            disabled={isManualBusyDisabled}
+                            disabled={isAddButtonDisabled}
+                            className={`h-7 px-2.5 text-[9px] font-black rounded-lg transition-all duration-300 ${
+                                isAddButtonDisabled 
+                                ? "bg-muted text-muted-foreground opacity-50 cursor-not-allowed" 
+                                : "bg-primary text-primary-foreground hover:opacity-90 shadow-sm"
+                            }`}
                         >
                             + ADD
                         </Button>
                     </div>
                 </div>
 
-                {/* 3. FARE INPUT SECTION - Disabled during Busy Mode */}
+                {/* 3. FARE INPUT SECTION */}
                 <div className={`space-y-2 transition-opacity duration-300 ${isFareDisabled ? "opacity-40" : "opacity-100"}`}>
                     <div className="flex gap-2">
                         <div className="relative flex-1 group">
