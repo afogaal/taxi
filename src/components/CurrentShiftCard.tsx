@@ -120,17 +120,17 @@ export function CurrentShiftCard({ currentShift, elapsedSeconds, remainingSecond
           </div>
         </CardHeader>
 
-        <CardContent className="pt-4 pb-5 space-y-5">
+        <CardContent className="pt-4 pb-5 space-y-4">
           {currentShift ? (
             <>
               {/* ELAPSED TIMER */}
               <div className="text-center">
                 <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground/50 block">Working Time</span>
-                <div className="text-5xl font-black tabular-nums tracking-tighter">{formatDuration(elapsedSeconds)}</div>
+                <div className="text-5xl font-black tabular-nums tracking-tighter leading-tight">{formatDuration(elapsedSeconds)}</div>
               </div>
 
               {/* STARTED + REMAINING GRID */}
-              <div className="grid grid-cols-1 gap-2.5">
+              <div className="grid grid-cols-1 gap-2">
                 <div className="px-4 py-3 bg-muted/40 rounded-[1.25rem] border border-border/50">
                   <span className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground/70 block mb-0.5">Started</span>
                   <div className="flex items-center gap-2 font-bold text-xs">
@@ -138,10 +138,12 @@ export function CurrentShiftCard({ currentShift, elapsedSeconds, remainingSecond
                     {format(new Date(currentShift.startTs),"PPP HH:mm")}
                   </div>
                 </div>
-                <div className={`px-4 py-3 rounded-[1.25rem] border ${isUrgent ? "bg-destructive/10 border-destructive/20" : "bg-muted/40 border-border/50"}`}>
-                  <span className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground/70 block mb-0.5">Remaining</span>
-                  <div className={`flex items-center gap-2 font-black text-xs ${isUrgent ? "text-destructive animate-pulse" : isWarning ? "text-orange-500" : "text-emerald-500"}`}>
-                    <AlertCircle className="h-3 w-3"/>
+                
+                {/* BIG REMAINING TIMER */}
+                <div className={`px-4 py-4 rounded-[1.25rem] border flex flex-col items-center justify-center ${isUrgent ? "bg-destructive/10 border-destructive/20" : "bg-muted/40 border-border/50"}`}>
+                  <span className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground/70 block mb-1">Remaining Quota</span>
+                  <div className={`flex items-center gap-3 font-black text-2xl tabular-nums ${isUrgent ? "text-destructive animate-pulse" : isWarning ? "text-orange-500" : "text-emerald-500"}`}>
+                    <AlertCircle className="h-5 w-5"/>
                     {formatRemaining(remainingSeconds)}
                   </div>
                 </div>
