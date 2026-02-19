@@ -74,15 +74,15 @@ export function AddFareCard({
         <Card className="border-none shadow-2xl overflow-hidden bg-card/60 backdrop-blur-xl ring-1 ring-white/10">
             <CardContent className="p-4 space-y-4">
                 
-                {/* 1. STATUS TOGGLE BAR */}
-                <div className={`p-1 rounded-2xl flex transition-all duration-500 ${busyActive ? 'bg-destructive/10' : 'bg-emerald-500/10'}`}>
+                {/* 1. STATUS TOGGLE BAR - Color switched to Amber for Busy */}
+                <div className={`p-1 rounded-2xl flex transition-all duration-500 ${busyActive ? 'bg-amber-500/10' : 'bg-emerald-500/10'}`}>
                     <Button
                         variant="ghost"
                         onClick={onToggleBusy}
                         disabled={disabled}
                         className={`flex-1 h-12 rounded-xl gap-3 text-sm font-black transition-all duration-300 ${
                             busyActive 
-                            ? "bg-destructive text-white shadow-[0_0_20px_rgba(239,68,68,0.3)] hover:bg-destructive/90" 
+                            ? "bg-amber-500 text-white shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:bg-amber-600" 
                             : "bg-emerald-600 text-white shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:bg-emerald-500"
                         }`}
                     >
