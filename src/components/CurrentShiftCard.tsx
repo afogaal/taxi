@@ -43,12 +43,12 @@ const formatDuration = (seconds: number) => {
 };
 
 const formatRemaining = (seconds: number) => {
-	const safe = Math.max(0, seconds);
-	const h = Math.floor(safe / 3600);
-	const m = Math.floor((safe % 3600) / 60);
-	const s = safe % 60;
-	return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  const safe = Math.max(0, seconds);
+  const h = Math.floor(safe / 3600);
+  const m = Math.floor((safe % 3600) / 60);
+  return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;
 };
+
 
 // ========================
 // PIN MODAL
@@ -209,7 +209,7 @@ export function CurrentShiftCard({
 							{/* ELAPSED TIMER */}
 							<div className="text-center">
 								<span className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/60">
-									Session Time
+									Working Time
 								</span>
 								<div className="text-6xl font-black tabular-nums tracking-tighter">
 									{formatDuration(elapsedSeconds)}
@@ -295,7 +295,7 @@ export function CurrentShiftCard({
 								className="w-full h-16 rounded-2xl bg-primary text-primary-foreground font-black uppercase shadow-xl"
 							>
 								<Play className="h-4 w-4 fill-current mr-2" />{" "}
-								Start Tracking
+								Start Shift
 							</Button>
 
 							{/* CUSTOM START */}
