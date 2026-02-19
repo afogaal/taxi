@@ -217,7 +217,7 @@ function TaxiTrackerContent() {
 	}, [state.currentShift]);
 
 	const cancelShift = useCallback(() => {
-		if (!confirm("Cancel current shift (not saved)?")) return;
+		
 		setState((s) => ({ ...s, currentShift: null }));
 		toast.info("Shift cancelled");
 	}, []);
