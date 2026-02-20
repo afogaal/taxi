@@ -1,74 +1,56 @@
+// Helper: convert seconds to "8h 30m" string
 const secondsToHMString = (seconds: number) => {
-	const safe = Math.max(0, seconds ?? 0);
+	const safe = Math.max(0, seconds);
 	const h = Math.floor(safe / 3600);
 	const m = Math.floor((safe % 3600) / 60);
 	return `${h}h ${m}m`;
 };
 
-const numberWithSep = (n: number) => n.toLocaleString();
-
-const formatDate = (ts: number) => new Date(ts).toLocaleDateString("sv-SE");
-const formatTimeOnly = (ts: number) =>
-	new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-interface PlatformData {
-	total?: number;
-	count?: number;
-}
-
-interface ShiftHistory {
-	startTs: number;
-	endTs: number;
-	seconds?: number;
-	trips?: number;
-	earnings?: number;
-	busySeconds?: number;
-	platformSummary?: Record<string, PlatformData>;
-}
-
-const onExportCSV = (history: ShiftHistory[]) => {
+// Export CSV function
+const onExportCSV = () => {
 	if (!Array.isArray(history) || history.length === 0) return;
 
+	// 1. Headers - proper labels for Excel
 	const headers = [
 		"Date",
 		"Shift Start",
 		"Shift End",
-		"Shift Duration",
+		"Shift Duration", // replaces "seconds"
 		"Trips",
 		"Earnings (kr)",
-		"Busy Duration",
+		"Busy Duration", // replaces "busy seconds"
 		"Platform Summary",
 	];
 
+	// 2. Rows
 	const rows = history.map((h) => {
 		const platforms =
-			h.platformSummary && Object.keys(h.platformSummary).length > 0 ?
+			h.platformSummary ?
 				Object.entries(h.platformSummary)
-					.filter(([_, v]) => (v?.total ?? 0) > 0)
-					.map(
-						([name, data]) =>
-							`${name}: ${numberWithSep(data?.total ?? 0)}`,
-					)
+					.filter(([, v]) => v.total > 0)
+					.map(([name, data]) => `${name}: ${data.total.toFixed(0)}`)
 					.join(" | ")
-			:	"None";
+			:	"";
 
 		return [
-			formatDate(h.startTs),
-			formatTimeOnly(h.startTs),
-			formatTimeOnly(h.endTs),
-			secondsToHMString(h.seconds ?? 0),
+			formatDate(h.startTs), // e.g. "2026-02-19"
+			formatTimeOnly(h.startTs), // e.g. "08:30"
+			formatTimeOnly(h.endTs), // e.g. "17:00"
+			secondsToHMString(h.seconds ?? 0), // e.g. "8h 30m"
 			h.trips ?? 0,
-			numberWithSep(h.earnings ?? 0),
-			secondsToHMString(h.busySeconds ?? 0),
+			(h.earnings ?? 0).toFixed(2),
+			secondsToHMString(h.busySeconds ?? 0), // e.g. "0h 45m"
 			platforms,
 		];
 	});
 
+	// 3. Build CSV content
 	const csvContent = [
 		headers.join(","),
 		...rows.map((row) => row.map((v) => `"${v}"`).join(",")),
 	].join("\n");
 
+	// 4. Trigger download
 	const blob = new Blob(["\uFEFF" + csvContent], {
 		type: "text/csv;charset=utf-8;",
 	});
