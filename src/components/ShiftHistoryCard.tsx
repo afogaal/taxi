@@ -1,28 +1,46 @@
-// Helper: convert seconds to "8h 30m" string
+interface PlatformData {
+	total: number;
+	count: number;
+}
+
+interface ShiftHistory {
+	startTs: number;
+	endTs: number;
+	seconds: number;
+	trips: number;
+	earnings: number;
+	busySeconds: number;
+	platformSummary?: Record<string, PlatformData>;
+}
+
 const secondsToHMString = (seconds: number) => {
 	const safe = Math.max(0, seconds);
 	const h = Math.floor(safe / 3600);
 	const m = Math.floor((safe % 3600) / 60);
 	return `${h}h ${m}m`;
 };
+import { format } from "date-fns";
 
-// Export CSV function
-const onExportCSV = () => {
+// Format full date, e.g. 2026-02-19
+const formatDate = (ts: number) => format(new Date(ts), "yyyy-MM-dd");
+
+// Format time only, e.g. 08:30
+const formatTimeOnly = (ts: number) => format(new Date(ts), "HH:mm");
+
+const onExportCSV = (history: ShiftHistory[]) => {
 	if (!Array.isArray(history) || history.length === 0) return;
 
-	// 1. Headers - proper labels for Excel
 	const headers = [
 		"Date",
 		"Shift Start",
 		"Shift End",
-		"Shift Duration", // replaces "seconds"
+		"Shift Duration",
 		"Trips",
 		"Earnings (kr)",
-		"Busy Duration", // replaces "busy seconds"
+		"Busy Duration",
 		"Platform Summary",
 	];
 
-	// 2. Rows
 	const rows = history.map((h) => {
 		const platforms =
 			h.platformSummary ?
@@ -33,24 +51,22 @@ const onExportCSV = () => {
 			:	"";
 
 		return [
-			formatDate(h.startTs), // e.g. "2026-02-19"
-			formatTimeOnly(h.startTs), // e.g. "08:30"
-			formatTimeOnly(h.endTs), // e.g. "17:00"
-			secondsToHMString(h.seconds ?? 0), // e.g. "8h 30m"
-			h.trips ?? 0,
-			(h.earnings ?? 0).toFixed(2),
-			secondsToHMString(h.busySeconds ?? 0), // e.g. "0h 45m"
+			formatDate(h.startTs),
+			formatTimeOnly(h.startTs),
+			formatTimeOnly(h.endTs),
+			secondsToHMString(h.seconds),
+			h.trips,
+			h.earnings.toFixed(2),
+			secondsToHMString(h.busySeconds),
 			platforms,
 		];
 	});
 
-	// 3. Build CSV content
 	const csvContent = [
 		headers.join(","),
 		...rows.map((row) => row.map((v) => `"${v}"`).join(",")),
 	].join("\n");
 
-	// 4. Trigger download
 	const blob = new Blob(["\uFEFF" + csvContent], {
 		type: "text/csv;charset=utf-8;",
 	});
