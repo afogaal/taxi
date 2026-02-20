@@ -1,46 +1,67 @@
-const onExportCSV = () => {
+// Helper: convert seconds to "Xh Ym"
+const secondsToHMString = (seconds: number) => {
+  const safe = Math.max(0, seconds ?? 0);
+  const h = Math.floor(safe / 3600);
+  const m = Math.floor((safe % 3600) / 60);
+  return `${h}h ${m}m`;
+};
+
+// Helper: format numbers with thousands separator
+const numberWithSep = (n: number) => n.toLocaleString();
+
+// Helper: format date as YYYY-MM-DD
+const formatDate = (ts: number) => new Date(ts).toLocaleDateString("sv-SE");
+
+// Helper: format time as HH:MM
+const formatTimeOnly = (ts: number) =>
+  new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+// Main CSV export function
+const onExportCSV = (history: any[]) => {
   if (!Array.isArray(history) || history.length === 0) return;
 
-  // 1. Headers with friendly names
+  // 1️⃣ CSV headers
   const headers = [
     "Date",
     "Shift Start",
     "Shift End",
-    "Shift Duration", // human-readable instead of raw seconds
+    "Shift Duration",
     "Trips",
     "Earnings (kr)",
-    "Busy Duration", // human-readable busy time
+    "Busy Duration",
     "Platform Summary",
   ];
 
-  // 2. Rows formatting
+  // 2️⃣ CSV rows
   const rows = history.map((h) => {
-    const platforms = h.platformSummary
-      ? Object.entries(h.platformSummary)
-          .filter(([, v]) => v.total > 0)
-          .map(([name, data]) => `${name}: ${data.total.toFixed(0)}`)
-          .join(" | ")
-      : "";
+    // Platform summary string, e.g. "Uber: 500 | Bolt: 300"
+    const platforms =
+      h.platformSummary && Object.keys(h.platformSummary).length > 0
+        ? Object.entries(h.platformSummary)
+            .filter(([, v]) => (v?.total ?? 0) > 0)
+            .map(([name, data]) => `${name}: ${numberWithSep(data.total ?? 0)}`)
+            .join(" | ")
+        : "None";
 
     return [
-      formatDate(h.startTs),
-      formatTimeOnly(h.startTs),
-      formatTimeOnly(h.endTs),
-      secondsToHM(h.seconds ?? 0),           // shift duration in hh:mm
+      formatDate(h.startTs ?? 0),
+      formatTimeOnly(h.startTs ?? 0),
+      formatTimeOnly(h.endTs ?? 0),
+      secondsToHMString(h.seconds ?? 0),
       h.trips ?? 0,
-      (h.earnings ?? 0).toFixed(2),
-      secondsToHM(h.busySeconds ?? 0),      // busy duration in hh:mm
+      numberWithSep(h.earnings ?? 0),
+      secondsToHMString(h.busySeconds ?? 0),
       platforms,
     ];
   });
 
-  // 3. Build CSV content
+  // 3️⃣ Build CSV content
   const csvContent = [
-    headers.join(","), 
+    headers.join(","),
     ...rows.map((row) => row.map((v) => `"${v}"`).join(",")),
   ].join("\n");
 
-  // 4. Download CSV
+  // 4️⃣ Trigger download
   const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
