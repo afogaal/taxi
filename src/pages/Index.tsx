@@ -244,7 +244,7 @@ const newFare: Fare = {
   platform,
 };
 
-...
+
 
 toast.success(`${platform} fare added: ${adjustedFare.toFixed(2)} kr`);
 
