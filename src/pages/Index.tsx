@@ -236,7 +236,7 @@ function TaxiTrackerContent() {
 		}
 
 		const adjustedFare =
-			platform === "Bolt" ? parseFloat((fare * 0.75).toFixed(2)) : fare;
+			platform === "Bolt" ? parseFloat((fare).toFixed(2)) : fare;
 
 		const newFare: Fare = {
 			id: `fare-${Date.now()}`,
