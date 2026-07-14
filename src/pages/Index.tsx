@@ -235,15 +235,18 @@ function TaxiTrackerContent() {
 			return;
 		}
 
-		const adjustedFare =
-			platform === "Bolt" ? parseFloat((fare).toFixed(2)) : fare;
+		const adjustedFare = fare;
 
-		const newFare: Fare = {
-			id: `fare-${Date.now()}`,
-			amount: adjustedFare,
-			timestamp: Date.now(),
-			platform,
-		};
+const newFare: Fare = {
+  id: `fare-${Date.now()}`,
+  amount: adjustedFare,
+  timestamp: Date.now(),
+  platform,
+};
+
+...
+
+toast.success(`${platform} fare added: ${adjustedFare.toFixed(2)} kr`);
 
 		setState((s) => {
 			if (!s.currentShift) return s;
