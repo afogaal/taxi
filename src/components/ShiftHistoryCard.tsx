@@ -51,19 +51,20 @@ export function ShiftHistoryCard({
 					Shift History
 				</h2>
 
-				<div className="flex gap-2">
-					<Button onClick={onExportCSV}>
-						Export CSV
-					</Button>
+				{history.length > 0 && (
+	<div className="flex gap-2">
+		<Button onClick={onExportCSV}>
+			Export CSV
+		</Button>
 
-					<Button
-						variant="destructive"
-						onClick={onClearHistory}
-					>
-						Clear
-					</Button>
-				</div>
-			</div>
+		<Button
+			variant="destructive"
+			onClick={onClearHistory}
+		>
+			Clear
+		</Button>
+	</div>
+)}
 
 			{history.length === 0 ? (
 				<p className="text-muted-foreground">
