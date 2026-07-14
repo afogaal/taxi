@@ -261,12 +261,9 @@ toast.success(`${platform} fare added: ${adjustedFare.toFixed(2)} kr`);
 		});
 
 		setFareInput("");
-		toast.success(
-			`${platform} fare added: ${adjustedFare.toFixed(2)} kr${
-				platform === "Bolt" ? " (after 23% fee)" : ""
-			}`,
-		);
-	}, [state.currentShift, fareInput, platform]);
+toast.success(
+	`${platform} fare added: ${adjustedFare.toFixed(2)} kr`,
+);
 
 	const editFare = useCallback((fare: Fare) => {
 		setEditingFare(fare);
