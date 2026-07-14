@@ -223,47 +223,48 @@ function TaxiTrackerContent() {
 	}, []);
 
 	const addFare = useCallback(() => {
-		if (!state.currentShift) {
-			alert("Start a shift first");
-			return;
-		}
-		if (!fareInput) return;
+	if (!state.currentShift) {
+		alert("Start a shift first");
+		return;
+	}
 
-		const fare = Number(fareInput);
-		if (isNaN(fare) || fare <= 0) {
-			alert("Enter a valid positive number");
-			return;
-		}
+	if (!fareInput) return;
 
-		const adjustedFare = fare;
+	const fare = Number(fareInput);
 
-const newFare: Fare = {
-  id: `fare-${Date.now()}`,
-  amount: adjustedFare,
-  timestamp: Date.now(),
-  platform,
-};
+	if (isNaN(fare) || fare <= 0) {
+		alert("Enter a valid positive number");
+		return;
+	}
 
+	const adjustedFare = fare;
 
+	const newFare: Fare = {
+		id: `fare-${Date.now()}`,
+		amount: adjustedFare,
+		timestamp: Date.now(),
+		platform,
+	};
 
-toast.success(`${platform} fare added: ${adjustedFare.toFixed(2)} kr`);
+	setState((s) => {
+		if (!s.currentShift) return s;
 
-		setState((s) => {
-			if (!s.currentShift) return s;
-			return {
-				...s,
-				currentShift: {
-					...s.currentShift,
-					fares: [newFare, ...s.currentShift.fares],
-					trips: s.currentShift.trips + 1,
-				},
-			};
-		});
+		return {
+			...s,
+			currentShift: {
+				...s.currentShift,
+				fares: [newFare, ...s.currentShift.fares],
+				trips: s.currentShift.trips + 1,
+			},
+		};
+	});
 
-		setFareInput("");
-toast.success(
-	`${platform} fare added: ${adjustedFare.toFixed(2)} kr`,
-);
+	setFareInput("");
+
+	toast.success(
+		`${platform} fare added: ${adjustedFare.toFixed(2)} kr`,
+	);
+}, [state.currentShift, fareInput, platform]);
 
 	const editFare = useCallback((fare: Fare) => {
 		setEditingFare(fare);
